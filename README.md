@@ -31,7 +31,7 @@
   <img src="docs/media/uigraph-demo.gif" alt="Running uigraph shows the UIGraph banner and starts the local viewer" width="800" />
 </p>
 
-UIGraph maps your project into services, APIs, dependencies and diagrams, and shows them in a local viewer. A coding agent you already use (Claude Code, Codex, OpenCode, Pi or Cursor) reads the project and writes the artifacts. One viewer shows every project you add.
+UIGraph maps your project into services, APIs, dependencies and diagrams, and shows them in a local viewer. The UIGraph skill, running in a coding agent you already use, reads the project and writes the artifacts. One viewer shows every project you add.
 
 UIGraph is open source.
 
@@ -51,33 +51,38 @@ Requires Node.js 20 or later.
 
 ## Quick start
 
-Run UIGraph inside your project:
+Install the UIGraph skill in your coding agent once:
+
+```sh
+npx skills add uigraph-oss/skills
+```
+
+Then, in your project, start the agent and ask it to generate the artifacts:
+
+```
+/uigraph Generate the UIGraph artifacts for this project
+```
+
+1. The agent explores the project.
+2. It proposes diagrams and existing documents, and you pick the ones you want.
+3. It writes the artifacts and adds them to the viewer.
+
+The first time, it also adds instructions for coding agents. See [What UIGraph changes in your project](#what-uigraph-changes-in-your-project).
+
+Then run UIGraph in the project:
 
 ```sh
 cd your-project
 uigraph
 ```
 
-UIGraph starts the viewer at `http://127.0.0.1:7357/`. If the project has no artifacts yet, it asks whether to generate them with an agent:
-
-1. Pick the agent.
-2. Confirm what the agent may read.
-3. The agent proposes diagrams, and you pick the ones to generate.
-4. The agent writes the artifacts, and the browser opens.
-
-If you skip generation, the viewer still runs and shows your other projects. The viewer keeps running in the background after the command finishes. Run `uigraph stop` to stop it.
+UIGraph starts the viewer at `http://127.0.0.1:7357/` and opens the browser. The viewer keeps running in the background after the command finishes. Run `uigraph stop` to stop it.
 
 Moving to another project? Run `uigraph` there too. If the viewer is already running, UIGraph adds the project to it instead of starting a second viewer.
 
 ## Use the UIGraph skill
 
-You can also create artifacts from inside your coding agent, one at a time, with the UIGraph skill. Install it once:
-
-```sh
-npx skills add uigraph-oss/skills
-```
-
-Then, in your project, start the agent and ask for what you need:
+You can also ask the skill for one artifact at a time:
 
 ```
 /uigraph Create a sequence diagram of the checkout flow
@@ -86,7 +91,7 @@ Then, in your project, start the agent and ask for what you need:
 /uigraph Create the database schema from the migrations
 ```
 
-The agent reads the code, proposes a plan, and waits. Reply with a message containing the word `Generate` to let it write the files. It writes only `.uigraph.yaml` and files under `.uigraph/`, for example:
+The agent reads the code and writes `.uigraph.yaml` and files under `.uigraph/`, for example:
 
 ```
 .uigraph.yaml
@@ -104,36 +109,12 @@ Edits you make in the viewer are saved back to the same files, so the agent sees
 
 ### `uigraph`
 
-Starts the viewer, offers to generate artifacts if the project has none, and opens the browser. If the project already has artifacts, it adds them to the viewer and opens it.
+Starts the viewer, adds the project's artifacts to it, and opens the browser. If the project has no artifacts, the viewer still runs and shows your other projects.
 
-If the project has artifacts but no instructions for coding agents, it asks whether to add them. See [`uigraph init`](#uigraph-init). If you answer no, it doesn't ask again for that project.
-
-| Option               | Effect                                                                                    |
-| -------------------- | ----------------------------------------------------------------------------------------- |
-| `--agent <name>`     | Agent to use: `claude`, `codex`, `opencode`, `pi` or `cursor`. Without it, UIGraph asks   |
-| `--model <name>`     | Model to use, in the agent's own format (OpenCode and Pi: `provider/model`)               |
-| `--max-budget <usd>` | Spending cap per agent session. Planning, generation and repair each get one. Claude only |
-| `--port <number>`    | Viewer port. Default `7357`, or `UIGRAPH_PORT`                                            |
-| `--no-open`          | Do not open a browser                                                                     |
-
-### `uigraph init`
-
-Sets up a project for UIGraph and exits. If the project has no artifacts, it generates them first. Then it asks whether to add or update the instructions for coding agents. Needs a terminal.
-
-The instructions tell coding agents such as Claude Code and Codex when and how to update the artifacts as they change the code. UIGraph writes them to `.uigraph/AGENTS.md` and adds a short UIGraph section that points to that file to `CLAUDE.md` and `AGENTS.md`, whichever exist. If neither exists, it creates `AGENTS.md`. Run `uigraph init` again to update the instructions to the current version.
-
-Takes the same `--agent`, `--model` and `--max-budget` options as `uigraph`.
-
-### `uigraph generate`
-
-Generates the artifacts and exits. If the project already has artifacts, it asks whether to update them. Needs a terminal.
-
-| Option               | Effect                                       |
-| -------------------- | -------------------------------------------- |
-| `--update`           | Regenerate existing artifacts without asking |
-| `--agent <name>`     | Same as for `uigraph`                        |
-| `--model <name>`     | Same as for `uigraph`                        |
-| `--max-budget <usd>` | Same as for `uigraph`                        |
+| Option            | Effect                                         |
+| ----------------- | ---------------------------------------------- |
+| `--port <number>` | Viewer port. Default `7357`, or `UIGRAPH_PORT` |
+| `--no-open`       | Do not open a browser                          |
 
 ### `uigraph sync`
 
@@ -175,7 +156,7 @@ Run `uigraph <command> --help` for details.
 
 ## Agents and sign-in
 
-UIGraph uses your own login for the agent you pick:
+Lens uses your own login for the agent you pick:
 
 - **Claude Code:** your Claude login or `ANTHROPIC_API_KEY`. Set `CLAUDE_CONFIG_DIR` if your Claude settings live outside `~/.claude`.
 - **Codex:** `codex login` or `CODEX_API_KEY`.
@@ -185,10 +166,8 @@ UIGraph uses your own login for the agent you pick:
 
 ## What UIGraph changes in your project
 
-- Generation sends project files to the model provider of the agent you pick. Codex also runs in its read-only sandbox.
-- UIGraph writes only `.uigraph.yaml` and `.uigraph/`. If generation fails or you press Ctrl+C, the previous artifacts are restored.
-- If you accept the instructions for coding agents, UIGraph also adds a UIGraph section to `CLAUDE.md` and `AGENTS.md`, or creates `AGENTS.md`. It never adds the section twice.
-- Projects where you declined the instructions are listed in `~/.uigraph/preferences.yaml`.
+- The UIGraph skill writes `.uigraph.yaml` and `.uigraph/`.
+- When the project has no artifacts yet, the skill also writes instructions for coding agents to `.uigraph/AGENTS.md`. They tell agents such as Claude Code and Codex when and how to update the artifacts as they change the code. It adds a short UIGraph section that points to that file to `CLAUDE.md` and `AGENTS.md`, whichever exist, or creates `AGENTS.md`.
 - Diagram edits in the viewer are saved back to the project's files. Services, APIs and dependencies are read-only in the viewer.
 - Diagrams created on the Diagrams page are saved in `~/.uigraph/`. Diagrams created on a service's Architecture tab are saved in that service's project.
 - The viewer listens on `127.0.0.1` only.

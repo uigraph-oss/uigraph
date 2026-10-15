@@ -13,9 +13,6 @@ export default defineConfig({
   minify: 'dce-only',
 
   onSuccess: () => {
-    copyFileSync('src/analysis/prompt.md', 'dist/prompt.md')
-    copyFileSync('src/analysis/plan-prompt.md', 'dist/plan-prompt.md')
-    copyFileSync('src/guidance/agents.md', 'dist/agents.md')
     copyFileSync('src/assets/uigraph-mark.png', 'dist/uigraph-mark.png')
     rmSync('dist/schema', { recursive: true, force: true })
     cpSync('src/graphql/schema', 'dist/schema', { recursive: true })

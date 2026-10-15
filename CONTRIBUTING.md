@@ -5,8 +5,8 @@ Thanks for helping improve UIGraph. This guide covers how to set up the project,
 ## Before you start
 
 - Search [existing issues](https://github.com/uigraph-oss/uigraph/issues) first. For anything larger than a small fix, open an issue to discuss the approach before writing code.
-- UIGraph is a CLI (`src/`) plus a local viewer (`viewer/`). The CLI starts the viewer, runs a coding agent to generate artifacts, and reads and writes them in the user's project.
-- The agent prompts live in `src/analysis/`. The UIGraph skill the agent downloads lives in a separate repository, [uigraph-oss/skills](https://github.com/uigraph-oss/skills). Changes to diagram or artifact conventions usually belong there, not here.
+- UIGraph is a CLI (`src/`) plus a local viewer (`viewer/`). The CLI starts the viewer, reads and writes artifacts in the user's project, and runs Lens reviews.
+- The CLI does not generate artifacts. The UIGraph skill does, and it lives in a separate repository, [uigraph-oss/skills](https://github.com/uigraph-oss/skills). Changes to generation, diagram or artifact conventions belong there, not here.
 
 ## What we value
 
@@ -14,7 +14,7 @@ These are the product guarantees users rely on. A change that weakens one needs 
 
 1. **UIGraph documents, it does not monitor or execute.** No live incident state, alerting, or actions taken on a user's services. Display and sync only.
 2. **Ground truth over inference.** Services, APIs and dependencies come from files in the repository. Where an agent writes artifacts, they must be reviewable, plain files the user can commit and diff.
-3. **A small footprint in the user's project.** Generation writes only `.uigraph.yaml` and `.uigraph/`. If generation fails or is interrupted, the previous artifacts are restored.
+3. **A small footprint in the user's project.** Artifacts live only in `.uigraph.yaml` and `.uigraph/`.
 4. **Local by default.** The viewer listens on `127.0.0.1` only. Do not add network listeners, telemetry, or outbound calls without discussion.
 5. **Honest consent and cost.** Anything that sends project contents to a model provider, or spends the user's money, is stated before it happens.
 
@@ -66,11 +66,10 @@ CI runs type-checking, linting, the build and a smoke test of the built CLI on N
 
 ### Working on agent integrations
 
-UIGraph supports several agents (Claude Code, Codex, OpenCode, Pi and Cursor). When you change generation or planning:
+Lens supports several agents (Claude Code, Codex, OpenCode, Pi and Cursor). When you change how Lens runs them:
 
-- Keep behavior consistent across agents, or document and gate the difference (for example, `--max-budget` works only with Claude).
+- Keep behavior consistent across agents, or document and gate the difference.
 - Never log or persist credentials. Authentication stays with the agent's own login or the user's environment variables.
-- Check the failure path: a failed or interrupted run must leave the previous artifacts in place.
 
 ## Commit messages
 
