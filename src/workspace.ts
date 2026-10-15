@@ -18,13 +18,9 @@ export const COMPONENT_API_CONTRACT_ID = 'component_api-contract'
 export const COMPONENT_FLOW_DIAGRAM_ID = 'component_backend-flow-diagram'
 export const COMPONENT_SUPPORT_KB_ID = 'component_support-kb-troubleshooting'
 const REGISTRY = '.uigraph/registry.yaml'
-const PREFERENCES = '.uigraph/preferences.yaml'
 const WORKSPACE_ID = 'workspace'
 
 const registrySchema = z.object({ projects: z.array(z.string().min(1)) })
-const preferencesSchema = z.object({
-  agentGuidance: z.object({ declined: z.array(z.string().min(1)) }),
-})
 
 type Project = { id: string; root: string; configFile: string }
 
@@ -72,32 +68,6 @@ export async function unregisterProject(root: string) {
     home,
     REGISTRY,
     stringify({ projects: projects.filter((project) => project !== root) })
-  )
-}
-
-async function readDeclinedGuidance(home: string) {
-  const text = await readOptional(path.join(home, PREFERENCES))
-  if (text === null) {
-    return []
-  }
-  return preferencesSchema.parse(parseYaml(text)).agentGuidance.declined
-}
-
-export async function isGuidanceDeclined(root: string) {
-  return (await readDeclinedGuidance(await homeRoot())).includes(root)
-}
-
-export async function setGuidanceDeclined(root: string, declined: boolean) {
-  const home = await homeRoot()
-  const others = (await readDeclinedGuidance(home)).filter(
-    (project) => project !== root
-  )
-  await writeArtifactFile(
-    home,
-    PREFERENCES,
-    stringify({
-      agentGuidance: { declined: declined ? [...others, root] : others },
-    })
   )
 }
 

@@ -83,20 +83,13 @@ describe('uigraph CLI', () => {
     expect(result.stderr).toContain('version: Invalid input: expected 1')
   })
 
-  it('explains that a repository without artifacts needs generate', async () => {
+  it('explains that a repository without artifacts needs the skill', async () => {
     const repository = await createRepo({ 'README.md': '# Shop' })
     const result = await uigraph('sync', repository)
     expect(result.code).toBe(1)
     expect(result.stderr).toContain(
-      `${repository} has no UIGraph artifacts. Run "uigraph generate" to generate them.`
+      `${repository} has no UIGraph artifacts. Ask your coding agent to generate them with the UIGraph skill`
     )
-  })
-
-  it('needs a terminal to generate', async () => {
-    const repository = await createRepo({ 'README.md': '# Shop' })
-    const result = await uigraph('generate', repository)
-    expect(result.code).toBe(1)
-    expect(result.stderr).toContain('"uigraph generate" needs a terminal.')
   })
 
   it('needs both branches for a local Lens review', async () => {

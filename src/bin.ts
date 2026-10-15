@@ -4,40 +4,21 @@ import {
   InvalidArgumentError,
   Option,
 } from '@commander-js/extra-typings'
-import { checkbox, confirm, input, select } from '@inquirer/prompts'
+import { select } from '@inquirer/prompts'
 import { AGENT_LABELS, AGENT_NAMES, type AgentName } from '@uigraph/lens/agents'
 import { consola, LogLevels } from 'consola'
 import { execFile, spawn } from 'node:child_process'
 import fs from 'node:fs/promises'
-import os from 'node:os'
 import path from 'node:path'
 import { inspect, promisify } from 'node:util'
 import open from 'open'
 import pc from 'picocolors'
-import {
-  AnalysisCancelledError,
-  AnalysisError,
-  describeUsage,
-  generateArtifacts,
-  loadSkill,
-  planDiagrams,
-  type DiagramPlan,
-  type SessionSettings,
-  type Skill,
-} from './analysis/analyze.js'
-import type {
-  DiagramCandidate,
-  DiagramSelection,
-  DocCandidate,
-} from './analysis/plan.js'
-import { listRepositoryFiles } from './analysis/repo-access.js'
 import {
   loadArtifacts,
   ROOT_CONFIG,
   type ArtifactDb,
 } from './artifacts/load.js'
 import { showBanner } from './banner.js'
-import { GUIDANCE_FILE, writeGuidance } from './guidance/guidance.js'
 import type { LensRequest } from './lens.js'
 import { readViewerLock, removeViewerLock, writeViewerLock } from './lock.js'
 import {
@@ -50,14 +31,13 @@ import {
 import { BUILD_ID, VERSION } from './version.js'
 import {
   homeRoot,
-  isGuidanceDeclined,
   listRegisteredProjects,
-  setGuidanceDeclined,
   syncProject,
   type SyncResult,
 } from './workspace.js'
 
-const ARTIFACT_ENTRIES = [ROOT_CONFIG, '.uigraph']
+const GENERATE_HINT =
+  'Ask your coding agent to generate them with the UIGraph skill (npx skills add uigraph-oss/skills).'
 
 if (process.env.UIGRAPH_DEBUG === '1') {
   consola.level = LogLevels.debug
@@ -68,31 +48,6 @@ class UsageError extends Error {}
 function fail(message: string, exitCode = 1): never {
   console.error(pc.red(`✖ ${message}`))
   process.exit(exitCode)
-}
-
-async function withCancellation<T>(
-  message: string,
-  work: (abortController: AbortController) => Promise<T>
-) {
-  const abortController = new AbortController()
-  let signals = 0
-  function onSignal() {
-    signals++
-    if (signals > 1) {
-      console.error(pc.red('\nForced exit.'))
-      process.exit(130)
-    }
-    console.log(pc.yellow(`\n${message} (press Ctrl+C again to force quit)`))
-    abortController.abort()
-  }
-  process.on('SIGINT', onSignal)
-  process.on('SIGTERM', onSignal)
-  try {
-    return await work(abortController)
-  } finally {
-    process.off('SIGINT', onSignal)
-    process.off('SIGTERM', onSignal)
-  }
 }
 
 async function resolveRepository(input: string | undefined) {
@@ -108,16 +63,6 @@ async function resolveRepository(input: string | undefined) {
     throw new UsageError(`Not a directory: ${realPath}`)
   }
   return realPath
-}
-
-function describeLimits(settings: SessionSettings) {
-  if (settings.maxBudgetUsd !== undefined) {
-    return `  • Each Claude session is capped at $${settings.maxBudgetUsd.toFixed(2)}.`
-  }
-  if (settings.agent === 'claude') {
-    return '  • No spending cap is set (see --max-budget); usage counts against your Claude plan or API account.'
-  }
-  return `  • Usage counts against your ${AGENT_LABELS[settings.agent]} plan or API account.`
 }
 
 async function chooseAgent(agent: AgentName | undefined, question: string) {
@@ -136,139 +81,6 @@ async function chooseAgent(agent: AgentName | undefined, question: string) {
       value: name,
     })),
   })
-}
-
-async function confirmAnalysis(root: string, settings: SessionSettings) {
-  const agent = AGENT_LABELS[settings.agent]
-  console.log(
-    [
-      '',
-      `${pc.bold('uigraph')} will generate UIGraph artifacts for ${pc.cyan(root)} with ${agent}.`,
-      '',
-      `  • ${agent} reads selected repository files (manifests, source, configs) and sends`,
-      settings.agent === 'opencode'
-        ? '    their contents to its model provider, using provider API keys from your environment.'
-        : `    their contents to its model provider, using your ${agent} login or API key.`,
-      `  • ${agent} first proposes which diagrams to generate and which existing docs to add,`,
-      '    and you choose. Nothing is written until you do.',
-      `  • ${agent} writes ${ROOT_CONFIG} and files under .uigraph/ in the repository. Nothing else`,
-      '    is changed. If generation fails, the previous artifacts are restored.',
-      describeLimits(settings),
-      '',
-    ].join('\n')
-  )
-  if (await confirm({ message: 'Continue?', default: false })) {
-    return true
-  }
-  console.log(pc.yellow(`Cancelled. Nothing was sent to ${agent}.`))
-  return false
-}
-
-async function promptForDiagrams(
-  candidates: readonly DiagramCandidate[],
-  preselected: ReadonlySet<string>,
-  docCandidates: readonly DocCandidate[],
-  agent: AgentName
-): Promise<DiagramSelection> {
-  const diagrams = await checkbox({
-    message: `${AGENT_LABELS[agent]} found ${candidates.length} ${candidates.length === 1 ? 'diagram' : 'diagrams'} worth generating. Pick the ones to generate.`,
-    choices: candidates.map((diagram) => ({
-      name: `${diagram.name}  ${pc.cyan(diagram.type)}`,
-      value: diagram,
-      checked: preselected.has(diagram.id),
-      description: `${diagram.summary}\nevidence: ${diagram.evidence.join(', ')}`,
-    })),
-    pageSize: candidates.length,
-  })
-  const docs =
-    docCandidates.length === 0
-      ? []
-      : await checkbox({
-          message: `${AGENT_LABELS[agent]} found ${docCandidates.length} existing ${docCandidates.length === 1 ? 'document' : 'documents'} in the repository. Pick the ones to add to the viewer.`,
-          choices: docCandidates.map((doc) => ({
-            name: `${doc.name}  ${pc.cyan(doc.path)}`,
-            value: doc,
-            checked: true,
-            description: doc.summary,
-          })),
-          pageSize: docCandidates.length,
-        })
-  const focus = (
-    await input({
-      message:
-        'Anything in particular to focus on? (optional, press Enter to skip)',
-    })
-  ).trim()
-  return {
-    diagrams,
-    docs,
-    focus: focus === '' ? null : focus,
-  }
-}
-
-async function chooseDiagrams(
-  root: string,
-  skill: Skill,
-  settings: SessionSettings
-): Promise<DiagramSelection | null> {
-  console.log(pc.bold('\nLooking for diagrams worth generating…\n'))
-  let plan: DiagramPlan | null
-  try {
-    plan = await withCancellation('Cancelling…', (abortController) =>
-      planDiagrams(root, path.basename(root), skill, abortController, settings)
-    )
-  } catch (error) {
-    if (error instanceof AnalysisCancelledError) {
-      fail('Cancelled. Nothing was written.', 130)
-    }
-    if (error instanceof AnalysisError) {
-      fail(`${error.message}\n  Nothing was written.`)
-    }
-    throw error
-  }
-  if (plan === null) {
-    console.log(
-      pc.yellow(
-        '\nCould not build a diagram plan. Generating the default set instead.'
-      )
-    )
-    return null
-  }
-  console.log(
-    pc.dim(
-      `\n  ${plan.diagrams.length} diagram and ${plan.docs.length} document candidates · ${plan.seconds}s · ${describeUsage(plan.usage)}`
-    )
-  )
-  const recommended = new Set(
-    plan.diagrams.filter((diagram) => diagram.recommended).map(({ id }) => id)
-  )
-  return promptForDiagrams(
-    plan.diagrams,
-    recommended,
-    plan.docs,
-    settings.agent
-  )
-}
-
-async function downloadSkillOrFail() {
-  try {
-    return await loadSkill()
-  } catch (error) {
-    if (error instanceof AnalysisError) {
-      fail(error.message)
-    }
-    throw error
-  }
-}
-
-async function countAnalyzableFiles(root: string) {
-  const files = await listRepositoryFiles(root, '**/*')
-  if (files.length === 0) {
-    fail(
-      'The repository has no analyzable files (generated directories and secret files are skipped). Nothing was sent to an agent.'
-    )
-  }
-  return files.length
 }
 
 async function findGitRemote(root: string) {
@@ -305,76 +117,6 @@ async function pathExists(file: string) {
   )
 }
 
-async function backupArtifacts(root: string) {
-  const backup = await fs.mkdtemp(path.join(os.tmpdir(), 'uigraph-'))
-  for (const entry of ARTIFACT_ENTRIES) {
-    if (await pathExists(path.join(root, entry))) {
-      await fs.cp(path.join(root, entry), path.join(backup, entry), {
-        recursive: true,
-        verbatimSymlinks: true,
-      })
-    }
-  }
-  return backup
-}
-
-async function restoreArtifacts(root: string, backup: string) {
-  for (const entry of ARTIFACT_ENTRIES) {
-    await fs.rm(path.join(root, entry), { recursive: true, force: true })
-    if (await pathExists(path.join(backup, entry))) {
-      await fs.cp(path.join(backup, entry), path.join(root, entry), {
-        recursive: true,
-        verbatimSymlinks: true,
-      })
-    }
-  }
-}
-
-async function runGeneration(
-  root: string,
-  fileCount: number,
-  update: boolean,
-  skill: Skill,
-  selection: DiagramSelection | null,
-  settings: SessionSettings
-) {
-  const gitRemote = await findGitRemote(root)
-  const backup = await backupArtifacts(root)
-  console.log(
-    pc.bold(
-      `\nGenerating artifacts from ${fileCount} ${fileCount === 1 ? 'file' : 'files'} with ${AGENT_LABELS[settings.agent]}…\n`
-    )
-  )
-  try {
-    await withCancellation('Cancelling generation…', (abortController) =>
-      generateArtifacts(
-        root,
-        path.basename(root),
-        gitRemote,
-        update,
-        abortController,
-        skill,
-        selection,
-        settings
-      )
-    )
-    console.log(
-      pc.green(`\n✔ Artifacts written to ${ROOT_CONFIG} and .uigraph/`)
-    )
-  } catch (error) {
-    await restoreArtifacts(root, backup)
-    if (error instanceof AnalysisCancelledError) {
-      fail('Generation cancelled. The previous artifacts were restored.', 130)
-    }
-    if (error instanceof AnalysisError) {
-      fail(`${error.message}\n  The previous artifacts were restored.`)
-    }
-    throw error
-  } finally {
-    await fs.rm(backup, { recursive: true, force: true })
-  }
-}
-
 function printSummary(db: ArtifactDb) {
   const endpoints = db.apiGroups.reduce(
     (count, { endpoints }) => count + endpoints.length,
@@ -387,72 +129,18 @@ function printSummary(db: ArtifactDb) {
   )
 }
 
-type GenerationOptions = {
-  agent: AgentName | undefined
-  model: string | undefined
-  maxBudgetUsd: number | undefined
-}
-
-async function generate(
-  root: string,
-  hasArtifacts: boolean,
-  options: GenerationOptions
-) {
-  const fileCount = await countAnalyzableFiles(root)
-  const settings: SessionSettings = {
-    agent: await chooseAgent(
-      options.agent,
-      'Which agent should generate the artifacts?'
-    ),
-    model: options.model,
-    maxBudgetUsd: options.maxBudgetUsd,
-  }
-  if (settings.agent !== 'claude' && settings.maxBudgetUsd !== undefined) {
-    throw new UsageError(
-      `--max-budget only works with Claude. ${AGENT_LABELS[settings.agent]} does not support a spending cap.`
-    )
-  }
-  if (!(await confirmAnalysis(root, settings))) {
-    return false
-  }
-  const skill = await downloadSkillOrFail()
-  const selection = await chooseDiagrams(root, skill, settings)
-  await runGeneration(root, fileCount, hasArtifacts, skill, selection, settings)
-  return true
-}
-
 async function registerProject(root: string, port: number) {
   const { db, errors } = await loadArtifacts(root)
   if (errors.length > 0) {
     console.error(
       pc.red(
-        `✖ The UIGraph artifacts are invalid:\n${errors.map((error) => `  • ${error}`).join('\n')}\n  Fix them or run "uigraph generate --update".`
+        `✖ The UIGraph artifacts are invalid:\n${errors.map((error) => `  • ${error}`).join('\n')}\n  Fix them, or ask your coding agent to fix them with the UIGraph skill.`
       )
     )
     return false
   }
   printSummary(db)
   return reportSync(root, await syncProject(root), port)
-}
-
-async function offerGuidance(root: string, hasGuidance: boolean) {
-  const accepted = await confirm({
-    message: hasGuidance
-      ? 'Update the UIGraph instructions for coding agents?'
-      : 'Add UIGraph instructions for coding agents?',
-    default: true,
-  })
-  await setGuidanceDeclined(root, !accepted)
-  if (!accepted) {
-    console.log(pc.dim('  Run "uigraph init" to add them later.'))
-    return
-  }
-  const files = await writeGuidance(root)
-  console.log(
-    pc.green(
-      `✔ Wrote ${GUIDANCE_FILE} and linked it from ${files.join(' and ')}`
-    )
-  )
 }
 
 function reportSync(root: string, result: SyncResult, port: number) {
@@ -737,7 +425,6 @@ function parseNumber(min: number, max: number, integer: boolean) {
 }
 
 const parsePort = parseNumber(1, 65535, true)
-const parseBudget = parseNumber(0.01, 10_000, false)
 
 function agentOption() {
   return new Option('--agent <name>', 'Coding agent to use').choices(
@@ -755,7 +442,7 @@ function portOption() {
 const program = new Command()
   .name('uigraph')
   .description(
-    'Generate UIGraph artifacts for a repository with a coding agent (Claude Code,\nCodex, OpenCode, Pi or Cursor) and browse every registered repository in one\nlocal viewer.'
+    'Browse the UIGraph artifacts of every registered repository in one local\nviewer, and review pull requests with Lens.'
   )
   .version(VERSION, '-v, --version')
   .option(
@@ -765,7 +452,7 @@ const program = new Command()
   .showHelpAfterError('(run uigraph --help for usage)')
   .addHelpText(
     'after',
-    '\nA repository literally named "open", "init", "generate", "sync", "start",\n"status", "stop", "restart" or "lens" can be passed as ./start.'
+    '\nA repository literally named "open", "sync", "start", "status", "stop",\n"restart" or "lens" can be passed as ./start.'
   )
   .hook('preAction', () => {
     if (program.opts().debug === true) {
@@ -777,152 +464,25 @@ const program = new Command()
 program
   .command('open', { isDefault: true })
   .description(
-    'Start the viewer, offer to generate artifacts if there are none, and open it (default)'
+    'Start the viewer, show the artifacts of a repository in it, and open it (default)'
   )
   .argument('[repository]', 'Repository path (default: current directory)')
-  .addOption(agentOption())
-  .option(
-    '--model <name>',
-    "Model to use for generation, in the agent's own format"
-  )
-  .option(
-    '--max-budget <usd>',
-    'Spending cap per Claude session (planning, generation and repair each get one). Claude only',
-    parseBudget
-  )
   .addOption(portOption())
   .option('--no-open', 'Do not open a browser')
   .action(async (repository, options) => {
     const root = await resolveRepository(repository)
     await startViewer(options.port, 'background')
     const hasArtifacts = await pathExists(path.join(root, ROOT_CONFIG))
-    let generated = false
+    let synced = true
     if (hasArtifacts) {
       console.log(`Opening the UIGraph artifacts in ${pc.cyan(root)}`)
-      console.log(pc.dim('  Run "uigraph generate --update" to update them.'))
-    } else if (!process.stdin.isTTY) {
-      console.log(
-        `${root} has no UIGraph artifacts. Run "uigraph generate" in a terminal to generate them.`
-      )
-    } else if (
-      await confirm({
-        message: `${root} has no UIGraph artifacts. Generate them with an agent?`,
-        default: true,
-      })
-    ) {
-      generated = await generate(root, false, {
-        agent: options.agent,
-        model: options.model,
-        maxBudgetUsd: options.maxBudget,
-      })
-    }
-    const synced =
-      hasArtifacts || generated
-        ? await registerProject(root, options.port)
-        : true
-    if (
-      process.stdin.isTTY &&
-      (hasArtifacts || generated) &&
-      !(await pathExists(path.join(root, GUIDANCE_FILE))) &&
-      !(await isGuidanceDeclined(root))
-    ) {
-      await offerGuidance(root, false)
+      synced = await registerProject(root, options.port)
+    } else {
+      console.log(`${root} has no UIGraph artifacts. ${GENERATE_HINT}`)
     }
     if (options.open) {
       await openBrowser(serverUrl(options.port))
     }
-    if (!synced) {
-      process.exitCode = 1
-    }
-  })
-
-program
-  .command('init')
-  .description(
-    'Generate artifacts if there are none, then add or update the instructions for coding agents'
-  )
-  .argument('[repository]', 'Repository path (default: current directory)')
-  .addOption(agentOption())
-  .option(
-    '--model <name>',
-    "Model to use for generation, in the agent's own format"
-  )
-  .option(
-    '--max-budget <usd>',
-    'Spending cap per Claude session (planning, generation and repair each get one). Claude only',
-    parseBudget
-  )
-  .action(async (repository, options) => {
-    const root = await resolveRepository(repository)
-    if (!process.stdin.isTTY) {
-      throw new UsageError('"uigraph init" needs a terminal.')
-    }
-    if (!(await pathExists(path.join(root, ROOT_CONFIG)))) {
-      const generated = await generate(root, false, {
-        agent: options.agent,
-        model: options.model,
-        maxBudgetUsd: options.maxBudget,
-      })
-      if (!generated) {
-        process.exitCode = 130
-        return
-      }
-    }
-    const synced = await registerProject(
-      root,
-      parsePort(process.env.UIGRAPH_PORT ?? String(DEFAULT_PORT))
-    )
-    await offerGuidance(root, await pathExists(path.join(root, GUIDANCE_FILE)))
-    if (!synced) {
-      process.exitCode = 1
-    }
-  })
-
-program
-  .command('generate')
-  .description('Generate artifacts, or update them after asking, then exit')
-  .argument('[repository]', 'Repository path (default: current directory)')
-  .option('--update', 'Regenerate existing artifacts without asking')
-  .addOption(agentOption())
-  .option(
-    '--model <name>',
-    "Model to use for generation, in the agent's own format"
-  )
-  .option(
-    '--max-budget <usd>',
-    'Spending cap per Claude session (planning, generation and repair each get one). Claude only',
-    parseBudget
-  )
-  .action(async (repository, options) => {
-    const root = await resolveRepository(repository)
-    if (!process.stdin.isTTY) {
-      throw new UsageError('"uigraph generate" needs a terminal.')
-    }
-    const hasArtifacts = await pathExists(path.join(root, ROOT_CONFIG))
-    if (
-      hasArtifacts &&
-      options.update !== true &&
-      !(await confirm({
-        message: `${root} already has UIGraph artifacts. Update them?`,
-        default: false,
-      }))
-    ) {
-      console.log('Nothing was changed.')
-      return
-    }
-    const generated = await generate(root, hasArtifacts, {
-      agent: options.agent,
-      model: options.model,
-      maxBudgetUsd: options.maxBudget,
-    })
-    if (!generated) {
-      process.exitCode = 130
-      return
-    }
-    const synced = await registerProject(
-      root,
-      parsePort(process.env.UIGRAPH_PORT ?? String(DEFAULT_PORT))
-    )
     if (!synced) {
       process.exitCode = 1
     }
@@ -935,9 +495,7 @@ program
   .action(async (repository) => {
     const root = await resolveRepository(repository)
     if (!(await pathExists(path.join(root, ROOT_CONFIG)))) {
-      throw new UsageError(
-        `${root} has no UIGraph artifacts. Run "uigraph generate" to generate them.`
-      )
+      throw new UsageError(`${root} has no UIGraph artifacts. ${GENERATE_HINT}`)
     }
     const synced = await registerProject(
       root,
