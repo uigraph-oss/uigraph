@@ -15,9 +15,7 @@ export function SectionGetStarted({ label }: { label: string }) {
             Generate UIGraph artifacts for this repo
           </code>
         </li>
-        <li>
-          3. The agent adds the artifacts to this viewer when it finishes.
-        </li>
+        <li>3. Your artifacts appear in the viewer.</li>
       </ol>
     </div>
   )

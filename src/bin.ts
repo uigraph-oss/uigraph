@@ -44,7 +44,7 @@ const GET_STARTED = `${pc.bold('Get started')}
        ${pc.cyan('npx skills add uigraph-oss/skills')}
   2. In your repository, ask the agent:
        ${pc.cyan('Generate UIGraph artifacts for this repo')}
-  3. The agent adds the artifacts to this viewer when it finishes.
+  3. Your artifacts appear in the viewer.
 `
 
 if (process.env.UIGRAPH_DEBUG === '1') {
