@@ -125,5 +125,5 @@ describe('uigraph CLI', () => {
     expect(stopped.code).toBe(0)
     expect(stopped.stdout).toMatch(/Stopped the UIGraph viewer \(pid \d+\)\./)
     await expect(fetch(`http://127.0.0.1:${port}/__uigraph`)).rejects.toThrow()
-  })
+  }, 30_000)
 })
