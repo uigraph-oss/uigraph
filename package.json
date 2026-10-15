@@ -1,6 +1,6 @@
 {
   "name": "uigraph",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate UIGraph artifacts for a repository with a coding agent and edit them in a local UIGraph viewer.",
   "keywords": [
     "architecture",
