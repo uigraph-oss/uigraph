@@ -39,6 +39,14 @@ import {
 const GENERATE_HINT =
   'Ask your coding agent to generate them with the UIGraph skill (npx skills add uigraph-oss/skills).'
 
+const GET_STARTED = `${pc.bold('Get started')}
+  1. Install the UIGraph skill for your coding agent:
+       ${pc.cyan('npx skills add uigraph-oss/skills')}
+  2. In your repository, ask the agent:
+       ${pc.cyan('Generate UIGraph artifacts for this repo')}
+  3. The agent adds the artifacts to this viewer when it finishes.
+`
+
 if (process.env.UIGRAPH_DEBUG === '1') {
   consola.level = LogLevels.debug
 }
@@ -259,11 +267,13 @@ async function startViewer(
     )
     console.log(pc.dim(`  Logs: ${logFile}`))
     console.log(pc.dim('  Run "uigraph stop" to stop it.\n'))
+    console.log(GET_STARTED)
     return null
   }
   const server = await startServer(port)
   await writeViewerLock({ pid: process.pid, port })
   console.log(`\n${pc.bold('UIGraph viewer')} running at ${pc.cyan(url)}\n`)
+  console.log(GET_STARTED)
   return server
 }
 

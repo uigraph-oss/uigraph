@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionGetStarted } from '@/components/section-get-started'
 import { SectionLoader } from '@/components/section-loader'
 import { SectionNotFound } from '@/components/section-not-found'
 import { Button } from '@/components/ui/button'
@@ -42,14 +43,10 @@ export function DiagramsFolder() {
           totalCount={totalCount}
           onPageChange={setPage}
         />
+      ) : search ? (
+        <SectionNotFound label="No flows match your search." />
       ) : (
-        <SectionNotFound
-          label={
-            search
-              ? 'No flows match your search.'
-              : 'The .uigraph artifacts have no diagrams.'
-          }
-        />
+        <SectionGetStarted label="The .uigraph artifacts have no diagrams." />
       )}
     </div>
   )
