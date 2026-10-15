@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionGetStarted } from '@/components/section-get-started'
 import { SectionLoader } from '@/components/section-loader'
 import { SectionNotFound } from '@/components/section-not-found'
 import { Button } from '@/components/ui/button'
@@ -99,7 +100,7 @@ export function DashboardServices() {
       {isServicesLoading ? (
         <SectionLoader label="Loading services..." />
       ) : services.length === 0 && !search ? (
-        <SectionNotFound label="The .uigraph artifacts have no services." />
+        <SectionGetStarted label="The .uigraph artifacts have no services." />
       ) : filtered.length === 0 ? (
         <SectionNotFound label="No services match your search." />
       ) : (
