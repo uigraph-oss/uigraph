@@ -1,0 +1,18 @@
+extend type Mutation {
+  createAssetUpload(orgId: ID!): AssetUpload!
+}
+
+extend type Query {
+  assetUrl(orgId: ID!, assetId: ID!): String
+  assetUrls(orgId: ID!, assetIds: [ID!]!): [AssetURL!]!
+}
+
+type AssetUpload {
+  assetId: ID!
+  uploadUrl: String!
+}
+
+type AssetURL {
+  assetId: ID!
+  url: String!
+}

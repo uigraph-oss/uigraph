@@ -1,0 +1,25 @@
+extend type Query {
+  me: Me!
+  myOrgs: [OrgSummary!]!
+}
+
+type Me {
+  userId: ID!
+  orgId: ID!
+  email: String!
+  name: String!
+  login: String!
+  kind: String!
+  isServerAdmin: Boolean!
+  authProvider: String!
+  avatarUrl: String
+}
+
+type OrgSummary {
+  id: ID!
+  name: String!
+  logoUrl: String
+  role: String!
+  active: Boolean!
+  onboardingDone: Boolean!
+}

@@ -1,0 +1,32 @@
+extend type Query {
+  comments(orgId: ID!, resourceId: ID!): [Comment!]!
+}
+
+extend type Mutation {
+  createComment(orgId: ID!, input: CreateCommentInput!): Comment!
+  updateComment(orgId: ID!, id: ID!, input: UpdateCommentInput!): Comment!
+  deleteComment(orgId: ID!, id: ID!): Boolean!
+}
+
+type Comment {
+  id: ID!
+  orgId: ID!
+  resourceId: ID!
+  parentCommentId: ID
+  text: String!
+  createdBy: ID!
+  updatedBy: ID
+  createdByActor: Actor
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input CreateCommentInput {
+  resourceId: ID!
+  text: String!
+  parentCommentId: ID
+}
+
+input UpdateCommentInput {
+  text: String
+}

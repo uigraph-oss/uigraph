@@ -1,0 +1,140 @@
+import { MoreVerticalIcon } from '@/assets/svgs'
+import { ActorAvatar } from '@/components/actor-avatar'
+import { BetterDeleteConfirmationModal } from '@/components/better-delete-confirmation-modal'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { DiagramLivePreview } from '@/features/diagram-portal/diagram-live-preview'
+import { usePermissions } from '@/hooks/use-permissions'
+import { cn } from '@/lib/utils'
+import { useCurrentOrganization } from '@/store/auth-store'
+import { useMutation } from '@apollo/client'
+import { format } from 'date-fns'
+import { Calendar } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { DashboardDiagram, DELETE_DIAGRAM } from './api/diagrams'
+
+type FlowDiagramCardProps = {
+  diagram: DashboardDiagram
+}
+
+export function FlowDiagramCard({ diagram }: FlowDiagramCardProps) {
+  const { canWrite } = usePermissions()
+  const orgId = useCurrentOrganization().id
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteDiagram] = useMutation(DELETE_DIAGRAM, {
+    awaitRefetchQueries: true,
+    refetchQueries: ['Diagrams'],
+  })
+
+  const portalLink = diagram.id ? `/diagram/${diagram.id}` : '#'
+
+  const updatedDate = diagram.updatedAt
+    ? new Date(diagram.updatedAt)
+    : diagram.createdAt
+      ? new Date(diagram.createdAt)
+      : null
+
+  return (
+    <div className="group relative">
+      <Link
+        target="_blank"
+        to={portalLink}
+        draggable={false}
+        className="relative block cursor-pointer overflow-hidden rounded-[1.4525rem] bg-[#141925] shadow-[0_1px_3px_rgba(0,0,0,0.3),0_1px_2px_rgba(0,0,0,0.2)] ring-1 ring-[#2A3242] transition-all duration-300 hover:shadow-[0_0_0_3px_rgba(59,107,255,0.22),0_8px_24px_rgba(0,0,0,0.4)] hover:ring-2 hover:ring-[#3B6BFF]"
+      >
+        <div className="relative aspect-[16/10] w-full bg-[#1A2030] transition-colors duration-300">
+          <DiagramLivePreview diagramId={diagram.id} />
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
+
+        <div className="h-px bg-[#2A3242]" />
+
+        <div className="px-4 py-3">
+          <h4 className="line-clamp-1 text-sm font-semibold text-[#F4F7FC]">
+            {diagram.name ? (
+              diagram.name.charAt(0).toUpperCase() + diagram.name.slice(1)
+            ) : (
+              <span className="text-[#586378]">Blank Diagram</span>
+            )}
+          </h4>
+
+          <div className="mt-2 flex min-h-[1.75rem] items-center justify-between gap-2">
+            {updatedDate ? (
+              <div className="flex min-w-0 items-center gap-1.5 text-[#586378]">
+                <Calendar className="h-3 w-3 shrink-0" />
+                <span className="text-[11px]">
+                  {format(updatedDate, 'dd MMM yyyy')}
+                </span>
+              </div>
+            ) : (
+              <span />
+            )}
+
+            <ActorAvatar
+              actor={diagram.updatedByActor ?? diagram.createdByActor}
+              commitHash={
+                diagram.updatedByActor
+                  ? diagram.updatedByCommitHash
+                  : diagram.createdByCommitHash
+              }
+              className="shrink-0"
+            />
+          </div>
+        </div>
+      </Link>
+
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="icon"
+            variant="ghost"
+            className={cn(
+              'absolute top-2 right-2 h-7 w-7 rounded-lg bg-[#1E2533]/80 opacity-0 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-[#2A3242]',
+              isDropdownOpen && 'opacity-100'
+            )}
+          >
+            <MoreVerticalIcon className="h-3.5 w-3.5 text-[#828DA3]" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            variant="destructive"
+            disabled={!canWrite}
+            onClick={() => setDeleteOpen(true)}
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <BetterDeleteConfirmationModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Do you want to delete this flow diagram?"
+        description="Deleting this flow diagram removes its files from the project and cannot be undone."
+        onConfirm={async () => {
+          try {
+            await deleteDiagram({ variables: { orgId, id: diagram.id } })
+            toast.success('Diagram deleted')
+            setDeleteOpen(false)
+          } catch (error) {
+            toast.error(
+              error instanceof Error
+                ? error.message
+                : 'Failed to delete diagram'
+            )
+          }
+        }}
+      />
+    </div>
+  )
+}

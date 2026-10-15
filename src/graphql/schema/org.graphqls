@@ -1,0 +1,48 @@
+extend type Query {
+  members(orgId: ID!): [Member!]!
+  teams(orgId: ID!): [Team!]!
+}
+
+extend type Mutation {
+  addMember(orgId: ID!, input: AddMemberInput!): Member!
+  updateMember(orgId: ID!, userId: ID!, input: UpdateMemberInput!): Member!
+  removeMember(orgId: ID!, userId: ID!): Boolean!
+}
+
+type Member {
+  userId: ID!
+  orgId: ID!
+  role: String!
+  source: String!
+  email: String!
+  name: String!
+  avatarUrl: String
+  teamId: ID
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Team {
+  id: ID!
+  orgId: ID!
+  name: String!
+  email: String
+  externalId: String
+  memberCount: Int!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input AddMemberInput {
+  name: String!
+  email: String!
+  password: String!
+  role: String!
+}
+
+input UpdateMemberInput {
+  name: String!
+  email: String!
+  role: String!
+  teamId: ID
+}

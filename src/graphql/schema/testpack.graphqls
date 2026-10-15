@@ -1,0 +1,13 @@
+type LoadTestThreshold {
+  id: ID!
+  metric: String!
+  comparator: String!
+  value: Float!
+}
+
+input LoadTestThresholdInput {
+  id: ID!
+  metric: String!
+  comparator: String!
+  value: Float!
+}

@@ -1,0 +1,243 @@
+import { gql, graphql, GT } from '@/api'
+import {
+  DynamoEditorSchema,
+  MongoCollectionSchema,
+} from '@/features/diagram-portal/components/nosql-editor/nosql-schema'
+import { arrayNonNullable } from 'daily-code'
+import { z } from 'zod'
+
+export type ServiceDbActor = {
+  id?: string | null
+  name?: string | null
+  avatarUrl?: string | null
+  type?: string | null
+  email?: string | null
+}
+
+export type DbColumn = GT.DbColumn
+export type DbIndex = GT.DbIndex
+export type DbTable = GT.DbTable
+
+export type ServiceDbNoSQLSchema = {
+  dynamo?: { table?: z.infer<typeof DynamoEditorSchema> | null } | null
+  mongo?: {
+    collections?: z.infer<typeof MongoCollectionSchema>[] | null
+  } | null
+  json?: {
+    collections?: unknown[] | null
+  } | null
+} | null
+
+export type ServiceDbSchema = {
+  dbDiagramId?: string | null
+  dbName?: string | null
+  dbType?: string | null
+  dialect?: string | null
+  noSQLSchema?: ServiceDbNoSQLSchema
+  pgDumpFileId?: string | null
+  serviceDBId?: string | null
+  serviceId?: string | null
+  tables?: DbTable[] | null
+  createdAt?: string | null
+  updatedAt?: string | null
+}
+
+export type LegacyServiceDb = ServiceDbSchema & {
+  serviceDBId: string
+  serviceId: string
+  dbName: string
+  dbType: string
+  dialect: string
+  createdByCommitHash?: string | null
+  updatedByCommitHash?: string | null
+  createdByActor?: ServiceDbActor | null
+  updatedByActor?: ServiceDbActor | null
+}
+
+export const SERVICE_DBS = graphql(`
+  query ServiceDBs($orgId: ID!, $serviceId: ID!) {
+    serviceDBs(orgId: $orgId, serviceId: $serviceId) {
+      id
+      serviceId
+      orgId
+      dbName
+      dbType
+      dialect
+      tables {
+        name
+        columns {
+          name
+          type
+          nullable
+          isPrimaryKey
+          unique
+          autoIncrement
+          defaultValue
+          foreignKey
+          description
+        }
+        indexes {
+          name
+          type
+          fields
+        }
+      }
+      noSQLSchema
+      dbDiagramId
+      pgDumpFileId
+      source
+      sourceTs
+      createdBy
+      updatedBy
+      createdByCommitHash
+      updatedByCommitHash
+      createdAt
+      updatedAt
+      createdByActor {
+        id
+        name
+        avatarUrl
+        type
+        email
+      }
+      updatedByActor {
+        id
+        name
+        avatarUrl
+        type
+        email
+      }
+    }
+  }
+`)
+
+export const SERVICE_DB = graphql(`
+  query ServiceDB($orgId: ID!, $serviceId: ID!, $id: ID!) {
+    serviceDB(orgId: $orgId, serviceId: $serviceId, id: $id) {
+      id
+      serviceId
+      orgId
+      dbName
+      dbType
+      dialect
+      tables {
+        name
+        columns {
+          name
+          type
+          nullable
+          isPrimaryKey
+          unique
+          autoIncrement
+          defaultValue
+          foreignKey
+          description
+        }
+        indexes {
+          name
+          type
+          fields
+        }
+      }
+      noSQLSchema
+      dbDiagramId
+      pgDumpFileId
+      source
+      sourceTs
+      createdBy
+      updatedBy
+      createdByCommitHash
+      updatedByCommitHash
+      createdAt
+      updatedAt
+      createdByActor {
+        id
+        name
+        avatarUrl
+        type
+        email
+      }
+      updatedByActor {
+        id
+        name
+        avatarUrl
+        type
+        email
+      }
+    }
+  }
+`)
+
+export const CREATE_SERVICE_DB = gql`
+  mutation CreateServiceDB(
+    $orgId: ID!
+    $serviceId: ID!
+    $input: CreateServiceDBInput!
+  ) {
+    createServiceDB(orgId: $orgId, serviceId: $serviceId, input: $input) {
+      id
+      dbName
+    }
+  }
+`
+
+export const UPDATE_SERVICE_DB = graphql(`
+  mutation UpdateServiceDB(
+    $orgId: ID!
+    $serviceId: ID!
+    $id: ID!
+    $input: UpdateServiceDBInput!
+  ) {
+    updateServiceDB(
+      orgId: $orgId
+      serviceId: $serviceId
+      id: $id
+      input: $input
+    ) {
+      id
+      dbName
+    }
+  }
+`)
+
+export const DELETE_SERVICE_DB = graphql(`
+  mutation DeleteServiceDB($orgId: ID!, $serviceId: ID!, $id: ID!) {
+    deleteServiceDB(orgId: $orgId, serviceId: $serviceId, id: $id)
+  }
+`)
+
+export function serviceDBToLegacy(db: {
+  id: string
+  serviceId: string
+  dbName: string
+  dbType: string
+  dialect: string
+  tables?: DbTable[] | null
+  noSQLSchema?: unknown
+  dbDiagramId?: string | null
+  pgDumpFileId?: string | null
+  createdAt: string
+  updatedAt: string
+  createdByCommitHash?: string | null
+  updatedByCommitHash?: string | null
+  createdByActor?: ServiceDbActor | null
+  updatedByActor?: ServiceDbActor | null
+}): LegacyServiceDb {
+  return {
+    serviceDBId: db.id,
+    serviceId: db.serviceId,
+    dbName: db.dbName,
+    dbType: db.dbType,
+    dialect: db.dialect,
+    tables: arrayNonNullable(db.tables),
+    noSQLSchema: (db.noSQLSchema ?? null) as ServiceDbNoSQLSchema,
+    dbDiagramId: db.dbDiagramId,
+    pgDumpFileId: db.pgDumpFileId,
+    createdAt: db.createdAt,
+    updatedAt: db.updatedAt,
+    createdByCommitHash: db.createdByCommitHash,
+    updatedByCommitHash: db.updatedByCommitHash,
+    createdByActor: db.createdByActor,
+    updatedByActor: db.updatedByActor,
+  }
+}

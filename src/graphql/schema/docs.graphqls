@@ -1,0 +1,53 @@
+extend type Query {
+  docs(
+    orgId: ID!
+    folderId: ID
+    teamId: ID
+    search: String
+    sortBy: String
+    sortDir: String
+    limit: Int
+    offset: Int
+  ): DocPage!
+  doc(orgId: ID!, id: ID!): Doc!
+}
+
+type DocPage {
+  items: [Doc!]!
+  totalCount: Int!
+}
+
+extend type Mutation {
+  createDoc(orgId: ID!, input: CreateDocInput!): Doc!
+  deleteDoc(orgId: ID!, id: ID!): Boolean!
+}
+
+type Doc {
+  id: ID!
+  orgId: ID!
+  folderId: ID
+  teamId: ID
+  fileAssetId: String!
+  fileUrl: String
+  fileName: String!
+  serviceName: String
+  fileType: String!
+  description: String!
+  contentHash: String!
+  createdBy: ID!
+  updatedBy: ID
+  createdByActor: Actor
+  updatedByActor: Actor
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input CreateDocInput {
+  fileName: String!
+  fileType: String
+  description: String
+  contentBase64: String
+  fileAssetId: String
+  folderId: ID
+  teamId: ID
+}

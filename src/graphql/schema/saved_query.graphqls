@@ -1,0 +1,75 @@
+extend type Query {
+  savedQueries(
+    orgId: ID!
+    serviceId: ID!
+    serviceDbId: ID!
+    scope: SavedQueryScope!
+  ): [SavedQuery!]!
+}
+
+extend type Mutation {
+  createSavedQuery(
+    orgId: ID!
+    serviceId: ID!
+    serviceDbId: ID!
+    input: CreateSavedQueryInput!
+  ): SavedQuery!
+  updateSavedQuery(
+    orgId: ID!
+    serviceId: ID!
+    serviceDbId: ID!
+    id: ID!
+    input: UpdateSavedQueryInput!
+  ): SavedQuery!
+  deleteSavedQuery(
+    orgId: ID!
+    serviceId: ID!
+    serviceDbId: ID!
+    id: ID!
+  ): Boolean!
+}
+
+enum SavedQueryScope {
+  PERSONAL
+  TEAM
+}
+
+type SavedQuery {
+  id: ID!
+  orgId: ID!
+  serviceDbId: ID!
+  folderId: ID
+  scope: SavedQueryScope!
+  ownerUserId: ID
+  teamId: ID
+  title: String!
+  description: String!
+  queryText: String!
+  tags: [String!]!
+  source: String
+  createdBy: ID!
+  updatedBy: ID
+  createdByCommitHash: String
+  updatedByCommitHash: String
+  createdByActor: Actor
+  updatedByActor: Actor
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input CreateSavedQueryInput {
+  title: String!
+  description: String
+  queryText: String!
+  tags: [String!]
+  folderId: ID
+  scope: SavedQueryScope!
+}
+
+input UpdateSavedQueryInput {
+  title: String
+  description: String
+  queryText: String
+  tags: [String!]
+  folderId: ID
+}

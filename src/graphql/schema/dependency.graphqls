@@ -1,0 +1,63 @@
+extend type Query {
+  dependencies(
+    orgId: ID!
+    serviceId: ID!
+    direction: String
+    criticality: String
+  ): [Dependency!]!
+  serviceDependencyGraph(orgId: ID!, serviceId: ID!): [Dependency!]!
+  dependencyGraph(orgId: ID!): [Dependency!]!
+}
+
+extend type Mutation {
+  updateServiceDependencies(
+    orgId: ID!
+    serviceId: ID!
+    input: UpdateServiceDependenciesInput!
+  ): [Dependency!]!
+}
+
+input UpdateServiceDependenciesInput {
+  dependencies: [ServiceDependencyInput!]!
+  commitHash: String
+}
+
+input ServiceDependencyInput {
+  name: String!
+  service: String!
+  direction: String!
+  type: String
+  criticality: String!
+  description: String
+  apiGroupName: String
+  apiEndpointNames: [String!]
+  databaseName: String
+}
+
+type Dependency {
+  id: ID!
+  name: String!
+  service: DependencyService
+  dependency: DependencyService
+  dependencyName: String!
+  direction: String!
+  type: String
+  criticality: String
+  description: String
+  apiGroupName: String
+  apiEndpointNames: [String!]
+  databaseName: String
+}
+
+type DependencyService {
+  id: ID!
+  name: String!
+  description: String
+  status: String
+  tier: String
+  category: String
+  language: String
+  gitRepoUrl: String
+  updatedAt: String
+  metadata: JSON
+}

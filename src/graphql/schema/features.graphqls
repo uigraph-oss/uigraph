@@ -1,0 +1,10 @@
+extend type Query {
+  features: Features!
+}
+
+type Features {
+  github: Boolean!
+  slack: Boolean!
+  enterprise: Boolean!
+  billingUrl: String
+}

@@ -1,0 +1,32 @@
+extend type Query {
+  serviceGitHubRepository(orgId: ID!, serviceId: ID!): ServiceGitHubRepository
+}
+
+extend type Mutation {
+  connectServiceGitHubRepository(
+    orgId: ID!
+    serviceId: ID!
+    owner: String!
+    repo: String!
+  ): ServiceGitHubRepository!
+  disconnectServiceGitHubRepository(orgId: ID!, serviceId: ID!): Boolean!
+}
+
+type ServiceGitHubRepository {
+  serviceId: ID!
+  githubId: ID!
+  owner: String!
+  name: String!
+  fullName: String!
+  url: String!
+  defaultBranch: String!
+  status: ServiceGitHubRepositoryStatus!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum ServiceGitHubRepositoryStatus {
+  ACTIVE
+  UNAVAILABLE
+  ARCHIVED
+}

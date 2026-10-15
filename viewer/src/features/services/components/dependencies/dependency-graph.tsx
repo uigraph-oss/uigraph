@@ -1,0 +1,868 @@
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { Paths } from '@/constants'
+import {
+  API_ENDPOINTS,
+  API_GROUPS,
+} from '@/features/services/api/api-endpoints'
+import type {
+  DependencyGraphEdge,
+  DependencyGraphNode,
+} from '@/features/services/api/dependencies'
+import { SERVICE_DBS } from '@/features/services/api/service-db'
+import { useCurrentOrganization } from '@/store/auth-store'
+import { useQuery } from '@apollo/client'
+import {
+  Background,
+  BaseEdge,
+  EdgeLabelRenderer,
+  Handle,
+  MarkerType,
+  Panel,
+  Position,
+  ReactFlow,
+  getBezierPath,
+  type CoordinateExtent,
+  type Edge,
+  type EdgeProps,
+  type FitViewOptions,
+  type Node,
+  type NodeProps,
+  type ReactFlowInstance,
+} from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
+import dagre from 'dagre'
+import {
+  CircleAlert,
+  Clock,
+  Database,
+  Github,
+  Globe,
+  Link2,
+  Loader2,
+  Radio,
+  Share2,
+} from 'lucide-react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
+
+type DependencyGraphProps = {
+  nodes: DependencyGraphNode[]
+  edges: DependencyGraphEdge[]
+  focusId?: string
+  onNodeClick?: (node: DependencyGraphNode) => void
+  marks?: Map<string, { color: string; label: string }>
+  edgeMarks?: Map<string, string>
+  selectedId?: string
+}
+
+type FlowNodeData = DependencyGraphNode & {
+  label: ReactNode
+  cardStyle: CSSProperties
+}
+
+type DependencyEdgeData = {
+  detailText?: string | null
+  edgeType?: string | null
+  criticality?: string | null
+  apiGroupName?: string | null
+  databaseName?: string | null
+  endpoints?: string[] | null
+  dependencyServiceId?: string
+  hard: boolean
+  showDetails: boolean
+  labelOffsetY: number
+}
+
+type DependencyFlowEdge = Edge<DependencyEdgeData, 'dependency'>
+
+function typeIcon(type?: string | null) {
+  if (type === 'database') return Database
+  if (type === 'http') return Globe
+  if (type === 'graphql') return Share2
+  if (type === 'grpc') return Radio
+  return Link2
+}
+
+const typeLabels: Record<string, string> = {
+  http: 'HTTP API',
+  graphql: 'GraphQL API',
+  grpc: 'gRPC API',
+  database: 'Database',
+}
+
+function DependencyTooltipContent({ data }: { data?: DependencyEdgeData }) {
+  const orgId = useCurrentOrganization().id
+  const isApi =
+    data?.edgeType === 'http' ||
+    data?.edgeType === 'graphql' ||
+    data?.edgeType === 'grpc'
+  const dependencyServiceId = data?.dependencyServiceId ?? ''
+  const apiGroupName = data?.apiGroupName ?? ''
+  const endpoints = data?.endpoints ?? []
+  const canFetch =
+    isApi &&
+    Boolean(orgId) &&
+    Boolean(dependencyServiceId) &&
+    !dependencyServiceId.startsWith('ghost:') &&
+    Boolean(apiGroupName) &&
+    endpoints.length > 0
+
+  const groupsQuery = useQuery(API_GROUPS, {
+    variables: { orgId, serviceId: dependencyServiceId },
+    skip: !canFetch,
+  })
+  const group = groupsQuery.data?.apiGroups?.find(
+    (g) => g.name === apiGroupName || g.label === apiGroupName
+  )
+  const endpointsQuery = useQuery(API_ENDPOINTS, {
+    variables: {
+      orgId,
+      serviceId: dependencyServiceId,
+      apiGroupId: group?.id ?? '',
+    },
+    skip: !canFetch || !group?.id,
+  })
+
+  const databaseName = data?.databaseName ?? ''
+  const canFetchDb =
+    data?.edgeType === 'database' &&
+    Boolean(orgId) &&
+    Boolean(dependencyServiceId) &&
+    !dependencyServiceId.startsWith('ghost:') &&
+    Boolean(databaseName)
+  const dbsQuery = useQuery(SERVICE_DBS, {
+    variables: { orgId, serviceId: dependencyServiceId },
+    skip: !canFetchDb,
+  })
+  const db = dbsQuery.data?.serviceDBs?.find((d) => d.dbName === databaseName)
+
+  if (!data) return null
+
+  const typeLabel = data.edgeType
+    ? (typeLabels[data.edgeType] ?? data.edgeType)
+    : 'Untyped dependency'
+
+  if (data.edgeType === 'database') {
+    const dbMeta = db ? (
+      <div className="text-[11px] opacity-60">
+        {[
+          db.dbType,
+          db.dialect && db.dialect.toLowerCase() !== db.dbType?.toLowerCase()
+            ? db.dialect
+            : null,
+          db.tables && db.tables.length > 0
+            ? `${db.tables.length} table${db.tables.length === 1 ? '' : 's'}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+      </div>
+    ) : null
+    const dbBody = (
+      <>
+        <div className="flex items-center gap-1.5 text-xs">
+          <Database className="size-3 shrink-0 opacity-70" />
+          <span className="font-mono">{databaseName || typeLabel}</span>
+        </div>
+        {dbsQuery.loading ? (
+          <div className="flex items-center gap-1.5 text-[11px] opacity-70">
+            <Loader2 className="size-3 animate-spin" />
+            Loading database…
+          </div>
+        ) : db ? (
+          dbMeta
+        ) : (
+          <div className="flex items-center gap-1.5 text-[11px] opacity-55">
+            <CircleAlert className="size-3 shrink-0 text-amber-400" />
+            Database not found
+          </div>
+        )}
+      </>
+    )
+    if (db?.id) {
+      return (
+        <a
+          href={Paths.services.database(dependencyServiceId, db.id)}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          className="flex flex-col gap-1 rounded px-1 py-0.5 text-left hover:bg-white/5"
+        >
+          {dbBody}
+        </a>
+      )
+    }
+    return <div className="flex flex-col gap-1 text-left">{dbBody}</div>
+  }
+
+  if (!isApi || endpoints.length === 0) {
+    return <div className="text-xs">{typeLabel}</div>
+  }
+
+  const loading = groupsQuery.loading || endpointsQuery.loading
+  if (loading) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs opacity-70">
+        <Loader2 className="size-3 animate-spin" />
+        Loading endpoints…
+      </div>
+    )
+  }
+
+  const byOperation = new Map(
+    (endpointsQuery.data?.apiEndpoints ?? []).map((e) => [e.operationId, e])
+  )
+
+  return (
+    <div className="flex flex-col gap-1 text-left">
+      {endpoints.map((operationId) => {
+        const endpoint = byOperation.get(operationId)
+        if (!endpoint) {
+          return (
+            <div
+              key={operationId}
+              className="flex items-center gap-1.5 px-1.5 py-1 text-xs leading-snug"
+            >
+              <CircleAlert className="size-3.5 shrink-0 text-amber-400/90" />
+              <span className="font-mono opacity-90">{operationId}</span>
+              <span className="opacity-50">
+                {apiGroupName
+                  ? `· not found in ${apiGroupName}`
+                  : '· not found'}
+              </span>
+            </div>
+          )
+        }
+        const row = (
+          <>
+            {endpoint.method ? (
+              <span className="shrink-0 rounded bg-white/10 px-1 py-px font-mono text-[10px] font-semibold opacity-80">
+                {endpoint.method.toUpperCase()}
+              </span>
+            ) : null}
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-mono opacity-90">{operationId}</span>
+              {endpoint.path ? (
+                <span className="font-mono break-words opacity-60">
+                  {endpoint.path}
+                </span>
+              ) : null}
+            </div>
+          </>
+        )
+        if (group?.id) {
+          return (
+            <a
+              key={operationId}
+              href={Paths.services.apiEndpoint(
+                dependencyServiceId,
+                group.id,
+                endpoint.id
+              )}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(event) => event.stopPropagation()}
+              className="flex items-center gap-2 rounded px-1.5 py-1 text-xs leading-snug hover:bg-white/10"
+            >
+              {row}
+            </a>
+          )
+        }
+        return (
+          <div
+            key={operationId}
+            className="flex items-center gap-2 px-1.5 py-1 text-xs leading-snug"
+          >
+            {row}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function DependencyEdge({
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  markerStart,
+  markerEnd,
+  style,
+  data,
+}: EdgeProps<DependencyFlowEdge>) {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  })
+
+  const showDetails = data?.showDetails ?? true
+  const Icon = typeIcon(data?.edgeType)
+  const hasTooltip = Boolean(data?.edgeType)
+  const offsetY = data?.labelOffsetY ?? 0
+
+  return (
+    <>
+      <BaseEdge
+        path={edgePath}
+        markerStart={markerStart}
+        markerEnd={markerEnd}
+        style={style}
+      />
+      <EdgeLabelRenderer>
+        {showDetails && data?.detailText ? (
+          <div
+            style={{
+              position: 'absolute',
+              transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY + offsetY}px)`,
+              pointerEvents: 'all',
+            }}
+          >
+            {(() => {
+              const labelNode = (
+                <div
+                  style={{
+                    alignItems: 'center',
+                    background: '#1A2130',
+                    border: '1px solid #2B3444',
+                    borderRadius: 4,
+                    color: '#AAB4C5',
+                    display: 'flex',
+                    fontSize: 10,
+                    gap: 4,
+                    lineHeight: 1.2,
+                    padding: '2px 6px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <Icon className="size-3 shrink-0 opacity-70" />
+                  {data.detailText}
+                </div>
+              )
+              if (!hasTooltip) return labelNode
+              return (
+                <Tooltip>
+                  <TooltipTrigger asChild>{labelNode}</TooltipTrigger>
+                  <TooltipContent className="max-w-[520px] p-1 [text-wrap:wrap]">
+                    <DependencyTooltipContent data={data} />
+                  </TooltipContent>
+                </Tooltip>
+              )
+            })()}
+          </div>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY + offsetY}px)`,
+              pointerEvents: 'all',
+            }}
+          >
+            {(() => {
+              const iconNode = (
+                <div
+                  style={{
+                    alignItems: 'center',
+                    background: '#1A2130',
+                    border: '1px solid #2B3444',
+                    borderRadius: 6,
+                    color: '#AAB4C5',
+                    display: 'flex',
+                    height: 22,
+                    justifyContent: 'center',
+                    width: 22,
+                  }}
+                >
+                  <Icon className="size-3" />
+                </div>
+              )
+              if (!hasTooltip) return iconNode
+              return (
+                <Tooltip>
+                  <TooltipTrigger asChild>{iconNode}</TooltipTrigger>
+                  <TooltipContent className="max-w-[520px] p-1 [text-wrap:wrap]">
+                    <DependencyTooltipContent data={data} />
+                  </TooltipContent>
+                </Tooltip>
+              )
+            })()}
+          </div>
+        )}
+      </EdgeLabelRenderer>
+    </>
+  )
+}
+
+function ServiceNode({ data }: NodeProps<Node<FlowNodeData>>) {
+  return (
+    <>
+      <Handle
+        type="target"
+        position={Position.Left}
+        isConnectable={false}
+        style={{ opacity: 0 }}
+      />
+      <div style={data.cardStyle}>{data.label}</div>
+      <Handle
+        type="source"
+        position={Position.Right}
+        isConnectable={false}
+        style={{ opacity: 0 }}
+      />
+    </>
+  )
+}
+
+const nodeTypes = { service_dependency: ServiceNode }
+
+const edgeTypes = { dependency: DependencyEdge }
+
+const fitViewOptions: FitViewOptions = {
+  padding: { top: '64px', right: '32px', bottom: '64px', left: '32px' },
+  maxZoom: 1,
+}
+
+export function DependencyGraph({
+  nodes,
+  edges,
+  focusId,
+  onNodeClick,
+  marks,
+  edgeMarks,
+  selectedId,
+}: DependencyGraphProps) {
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const flowRef = useRef<ReactFlowInstance<
+    Node<FlowNodeData>,
+    DependencyFlowEdge
+  > | null>(null)
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [showDetails, setShowDetails] = useState(true)
+
+  useEffect(() => {
+    const element = canvasRef.current
+    if (!element) return
+    const observer = new ResizeObserver(([entry]) => {
+      setCanvasSize({
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      })
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  const nodeIds = nodes.map((node) => node.id).join(' ')
+  useEffect(() => {
+    void flowRef.current?.fitView({ ...fitViewOptions, duration: 300 })
+  }, [canvasSize.width, canvasSize.height, nodeIds])
+
+  const edgeMeta = new Map<
+    string,
+    { type?: string | null; criticality?: string | null }
+  >()
+  for (const edge of edges) {
+    for (const id of [edge.source, edge.target]) {
+      if (!edgeMeta.has(id)) {
+        edgeMeta.set(id, { type: edge.type, criticality: edge.criticality })
+      }
+    }
+  }
+
+  const nodeWidth = 240
+
+  const layout = new dagre.graphlib.Graph()
+  layout.setDefaultEdgeLabel(() => ({}))
+  layout.setGraph({ rankdir: 'LR', nodesep: 42, ranksep: 240 })
+
+  for (const node of nodes)
+    layout.setNode(node.id, { width: nodeWidth, height: 128 })
+  for (const edge of edges) {
+    if (edge.direction === 'downstream') {
+      layout.setEdge(edge.source, edge.target)
+    } else if (edge.direction === 'upstream') {
+      layout.setEdge(edge.target, edge.source)
+    } else {
+      throw new Error(`unknown dependency direction: ${edge.direction}`)
+    }
+  }
+  dagre.layout(layout)
+
+  const flowNodes: Node<FlowNodeData>[] = nodes.map((node) => {
+    const position = layout.node(node.id)
+    const isFocus = node.id === focusId
+    const onboarded = Boolean(node.service?.id)
+    const meta = edgeMeta.get(node.id)
+    const hard = meta?.criticality?.toLowerCase() === 'hard'
+    const mark = marks?.get(node.id)
+    const isSelected = node.id === selectedId
+
+    const border = mark
+      ? `1px solid ${mark.color}`
+      : isFocus
+        ? '1px solid #3B82F6'
+        : !onboarded
+          ? '1px dashed #8A4B4B'
+          : hard
+            ? '1px solid #C2703F'
+            : '1px solid #3B4658'
+
+    const clickable = mark ? true : !isFocus && Boolean(node.service?.id)
+
+    const service = node.service
+    const repoLabel = service?.gitRepoUrl
+      ? service.gitRepoUrl
+          .replace(/^https?:\/\/(www\.)?github\.com\//i, '')
+          .replace(/\.git$/i, '')
+      : ''
+    const updatedLabel = service?.updatedAt
+      ? new Date(service.updatedAt).toLocaleDateString(undefined, {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        })
+      : ''
+
+    return {
+      id: node.id,
+      type: 'service_dependency',
+      position: { x: position.x - nodeWidth / 2, y: position.y - 64 },
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
+      data: {
+        ...node,
+        label: (() => {
+          const content = (
+            <div className="flex flex-col text-left leading-snug">
+              <span className="block font-semibold">{node.name}</span>
+              {mark || meta?.criticality || meta?.type ? (
+                <div className="mt-[3px] ml-[-1px] flex flex-wrap items-center gap-1">
+                  {mark ? (
+                    <span
+                      className="flex items-center gap-1 rounded px-1.5 py-[1px] text-[9px] leading-[15px] font-medium"
+                      style={{
+                        background: `color-mix(in srgb, ${mark.color} 16%, transparent)`,
+                        color: mark.color,
+                      }}
+                    >
+                      <span
+                        className="size-1.5 rounded-full"
+                        style={{ background: mark.color }}
+                      />
+                      {mark.label}
+                    </span>
+                  ) : null}
+                  {meta?.criticality ? (
+                    <span
+                      className="rounded px-1.5 py-[1px] text-[9px] leading-[15px] font-medium capitalize"
+                      style={{
+                        background: hard
+                          ? 'rgba(194, 112, 63, 0.16)'
+                          : 'rgba(96, 116, 148, 0.22)',
+                        color: hard ? '#E0A97F' : '#A6B6CC',
+                      }}
+                    >
+                      {meta.criticality}
+                    </span>
+                  ) : null}
+                  {meta?.type ? (
+                    <span
+                      className="rounded px-1.5 py-[1px] text-[9px] leading-[15px] font-medium"
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.14)',
+                        color: '#8AB0EA',
+                      }}
+                    >
+                      {meta.type}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
+              {service?.description ? (
+                <span className="mt-1.5 line-clamp-2 text-[11px] font-normal opacity-60">
+                  {service.description}
+                </span>
+              ) : null}
+              {service?.gitRepoUrl || updatedLabel ? (
+                <div className="mt-2 flex flex-col gap-1">
+                  {service?.gitRepoUrl ? (
+                    <a
+                      href={service.gitRepoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      className="flex items-center gap-1.5 text-[10px] font-normal text-[#7FA8E0] hover:underline"
+                    >
+                      <Github className="size-3 shrink-0" />
+                      <span className="truncate">{repoLabel}</span>
+                    </a>
+                  ) : null}
+                  {updatedLabel ? (
+                    <span className="flex items-center gap-1.5 text-[10px] font-normal opacity-50">
+                      <Clock className="size-3 shrink-0" />
+                      Updated {updatedLabel}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          )
+
+          if (onboarded) {
+            return content
+          }
+
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>{content}</TooltipTrigger>
+              <TooltipContent className="bg-destructive [&_svg]:bg-destructive [&_svg]:fill-destructive max-w-[200px] text-center text-white">
+                This service is not available or onboarded to UIGraph.
+              </TooltipContent>
+            </Tooltip>
+          )
+        })(),
+        cardStyle: {
+          animation: mark
+            ? `dependency-node-in 420ms ease-out ${Math.floor(position.x / (nodeWidth + 240)) * 120}ms both`
+            : undefined,
+          background: mark
+            ? `color-mix(in srgb, ${mark.color} 8%, #1A2030)`
+            : onboarded
+              ? '#1E2533'
+              : '#1C1416',
+          border,
+          borderRadius: 10,
+          boxShadow: isSelected
+            ? `0 0 0 2px #111722, 0 0 0 4px ${mark?.color ?? '#3B82F6'}`
+            : isFocus
+              ? '0 0 0 4px rgba(59, 130, 246, 0.18), 0 0 22px 4px rgba(59, 130, 246, 0.45)'
+              : mark
+                ? `0 6px 22px -8px color-mix(in srgb, ${mark.color} 55%, transparent)`
+                : onboarded
+                  ? '0 4px 12px rgba(0, 0, 0, 0.22)'
+                  : 'none',
+          color: onboarded || mark ? '#F4F7FC' : '#C79A9A',
+          transition: 'box-shadow 200ms ease',
+          cursor: clickable ? 'pointer' : 'default',
+          fontSize: 13,
+          opacity: onboarded || mark ? 1 : 0.72,
+          padding: '11px 13px',
+          width: nodeWidth,
+        },
+      },
+      draggable: false,
+    }
+  })
+
+  const nodeHeight = 128
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const node of flowNodes) {
+    minX = Math.min(minX, node.position.x)
+    minY = Math.min(minY, node.position.y)
+    maxX = Math.max(maxX, node.position.x + nodeWidth)
+    maxY = Math.max(maxY, node.position.y + nodeHeight)
+  }
+  const viewportWidth = (canvasSize.width || 400) / zoom
+  const viewportHeight = (canvasSize.height || 400) / zoom
+  const keepVisible = 120 / zoom
+  const paddingX = Math.max(viewportWidth - keepVisible, 0)
+  const paddingY = Math.max(viewportHeight - keepVisible, 0)
+  const translateExtent: CoordinateExtent | undefined = flowNodes.length
+    ? [
+        [minX - paddingX, minY - paddingY],
+        [maxX + paddingX, maxY + paddingY],
+      ]
+    : undefined
+
+  const labelLayouts = edges.map((edge) => {
+    const endpoints = edge.apiEndpointNames ?? []
+    const labelText =
+      endpoints.length > 0
+        ? endpoints[0]
+        : edge.databaseName
+          ? edge.databaseName
+          : edge.type
+    const shortText =
+      labelText && labelText.length > 14
+        ? labelText.slice(0, 13).trimEnd() + '…'
+        : labelText
+    const detailText =
+      endpoints.length > 1 ? `${shortText} +${endpoints.length - 1}` : shortText
+
+    const source = layout.node(edge.source)
+    const target = layout.node(edge.target)
+    const labelled = showDetails && Boolean(detailText)
+
+    return {
+      edge,
+      endpoints,
+      detailText,
+      x: (source.x + target.x) / 2,
+      y: (source.y + target.y) / 2,
+      width: labelled ? (detailText?.length ?? 0) * 5.8 + 32 : 22,
+      height: labelled ? 18 : 22,
+      offsetY: 0,
+    }
+  })
+
+  const placedLabels: { x0: number; x1: number; y0: number; y1: number }[] = []
+  for (const label of [...labelLayouts].sort((a, b) => a.y - b.y)) {
+    const x0 = label.x - label.width / 2
+    const x1 = label.x + label.width / 2
+    let y = label.y
+    for (let pass = 0; pass <= placedLabels.length; pass++) {
+      let shifted = false
+      for (const placed of placedLabels) {
+        const overlapsX = x0 < placed.x1 + 6 && x1 > placed.x0 - 6
+        const overlapsY =
+          y - label.height / 2 < placed.y1 + 6 &&
+          y + label.height / 2 > placed.y0 - 6
+        if (overlapsX && overlapsY) {
+          y = placed.y1 + 6 + label.height / 2
+          shifted = true
+        }
+      }
+      if (!shifted) break
+    }
+    placedLabels.push({
+      x0,
+      x1,
+      y0: y - label.height / 2,
+      y1: y + label.height / 2,
+    })
+    label.offsetY = y - label.y
+  }
+
+  const flowEdges: DependencyFlowEdge[] = labelLayouts.map(
+    ({ edge, endpoints, detailText, offsetY }) => {
+      const hard = edge.criticality?.toLowerCase() === 'hard'
+      const edgeMark = edgeMarks?.get(edge.id)
+      const stroke = edgeMark ?? (hard ? '#C2703F' : '#64748B')
+
+      const marker = {
+        type: MarkerType.ArrowClosed,
+        color: stroke,
+      }
+
+      let caller: string
+      let callee: string
+      if (edge.direction === 'downstream') {
+        caller = edge.source
+        callee = edge.target
+      } else if (edge.direction === 'upstream') {
+        caller = edge.target
+        callee = edge.source
+      } else {
+        throw new Error(`unknown dependency direction: ${edge.direction}`)
+      }
+
+      let source: string
+      let target: string
+      let markerStart = undefined
+      let markerEnd = undefined
+      if (layout.node(caller).x <= layout.node(callee).x) {
+        source = caller
+        target = callee
+        markerEnd = marker
+      } else {
+        source = callee
+        target = caller
+        markerStart = marker
+      }
+
+      return {
+        id: edge.id,
+        source,
+        target,
+        type: 'dependency',
+        animated: Boolean(edgeMark),
+        markerStart,
+        markerEnd,
+        data: {
+          detailText,
+          edgeType: edge.type,
+          criticality: edge.criticality,
+          apiGroupName: edge.apiGroupName,
+          databaseName: edge.databaseName,
+          endpoints,
+          dependencyServiceId: edge.target,
+          hard,
+          showDetails,
+          labelOffsetY: offsetY,
+        },
+        style: {
+          stroke,
+          strokeWidth: edgeMark ? 2.5 : hard ? 2 : 1.5,
+          strokeDasharray: edgeMark ? '6 4' : hard ? undefined : '5 4',
+          opacity: edgeMarks && !edgeMark ? 0.35 : 1,
+        },
+      }
+    }
+  )
+
+  return (
+    <div
+      ref={canvasRef}
+      className="dependency-graph-canvas h-full min-h-[26rem] overflow-hidden rounded-xl border border-[#2A3242] bg-[#111722]"
+    >
+      <style>{`
+        .dependency-graph-canvas .react-flow__handle { opacity: 0; }
+        .dependency-graph-canvas .react-flow__edge.animated path { animation-duration: 1.2s; }
+        @keyframes dependency-node-in {
+          from { opacity: 0; transform: translateY(6px) scale(0.97); }
+        }
+      `}</style>
+      <ReactFlow
+        nodes={flowNodes}
+        edges={flowEdges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        fitView
+        fitViewOptions={fitViewOptions}
+        minZoom={0.2}
+        maxZoom={1.5}
+        translateExtent={translateExtent}
+        nodesConnectable={false}
+        nodesDraggable={false}
+        elementsSelectable={false}
+        onInit={(instance) => {
+          flowRef.current = instance
+          setZoom(instance.getViewport().zoom)
+        }}
+        onMove={(_, viewport) => setZoom(viewport.zoom)}
+        onNodeClick={(_, node) => onNodeClick?.(node.data)}
+      >
+        <Panel position="top-left">
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#2A3242] bg-[#141925]/95 px-3 py-2 text-[11px] font-medium text-[#AAB4C5] shadow-lg">
+            Dependency details
+            <Checkbox
+              checked={showDetails}
+              onCheckedChange={(checked) => setShowDetails(checked === true)}
+            />
+          </label>
+        </Panel>
+        <Background color="#2A3242" gap={20} size={1} />
+      </ReactFlow>
+    </div>
+  )
+}

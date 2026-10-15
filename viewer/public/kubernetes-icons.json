@@ -1,0 +1,314 @@
+[
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "API Server",
+    "fileName": "api.svg",
+    "relativePath": "control-plane/api.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "Cloud Controller Manager",
+    "fileName": "c-c-m.svg",
+    "relativePath": "control-plane/c-c-m.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "Controller Manager",
+    "fileName": "c-m.svg",
+    "relativePath": "control-plane/c-m.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "Kube Proxy",
+    "fileName": "k-proxy.svg",
+    "relativePath": "control-plane/k-proxy.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "Kubelet",
+    "fileName": "kubelet.svg",
+    "relativePath": "control-plane/kubelet.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Control Plane",
+    "subcategory": null,
+    "name": "Scheduler",
+    "fileName": "sched.svg",
+    "relativePath": "control-plane/sched.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Infrastructure",
+    "subcategory": null,
+    "name": "Control Plane",
+    "fileName": "control-plane.svg",
+    "relativePath": "infrastructure/control-plane.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Infrastructure",
+    "subcategory": null,
+    "name": "etcd",
+    "fileName": "etcd.svg",
+    "relativePath": "infrastructure/etcd.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Infrastructure",
+    "subcategory": null,
+    "name": "Node",
+    "fileName": "node.svg",
+    "relativePath": "infrastructure/node.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Cluster Role",
+    "fileName": "c-role.svg",
+    "relativePath": "resources/c-role.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "ConfigMap",
+    "fileName": "cm.svg",
+    "relativePath": "resources/cm.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Cluster Role Binding",
+    "fileName": "crb.svg",
+    "relativePath": "resources/crb.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Custom Resource Definition",
+    "fileName": "crd.svg",
+    "relativePath": "resources/crd.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "CronJob",
+    "fileName": "cronjob.svg",
+    "relativePath": "resources/cronjob.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Deployment",
+    "fileName": "deploy.svg",
+    "relativePath": "resources/deploy.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "DaemonSet",
+    "fileName": "ds.svg",
+    "relativePath": "resources/ds.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Endpoint",
+    "fileName": "ep.svg",
+    "relativePath": "resources/ep.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Group",
+    "fileName": "group.svg",
+    "relativePath": "resources/group.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Horizontal Pod Autoscaler",
+    "fileName": "hpa.svg",
+    "relativePath": "resources/hpa.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Ingress",
+    "fileName": "ing.svg",
+    "relativePath": "resources/ing.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Job",
+    "fileName": "job.svg",
+    "relativePath": "resources/job.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Limit Range",
+    "fileName": "limits.svg",
+    "relativePath": "resources/limits.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Network Policy",
+    "fileName": "netpol.svg",
+    "relativePath": "resources/netpol.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Namespace",
+    "fileName": "ns.svg",
+    "relativePath": "resources/ns.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Pod",
+    "fileName": "pod.svg",
+    "relativePath": "resources/pod.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Pod Security Policy",
+    "fileName": "psp.svg",
+    "relativePath": "resources/psp.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Persistent Volume",
+    "fileName": "pv.svg",
+    "relativePath": "resources/pv.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Persistent Volume Claim",
+    "fileName": "pvc.svg",
+    "relativePath": "resources/pvc.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Resource Quota",
+    "fileName": "quota.svg",
+    "relativePath": "resources/quota.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Role Binding",
+    "fileName": "rb.svg",
+    "relativePath": "resources/rb.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Role",
+    "fileName": "role.svg",
+    "relativePath": "resources/role.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "ReplicaSet",
+    "fileName": "rs.svg",
+    "relativePath": "resources/rs.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Service Account",
+    "fileName": "sa.svg",
+    "relativePath": "resources/sa.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Storage Class",
+    "fileName": "sc.svg",
+    "relativePath": "resources/sc.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Secret",
+    "fileName": "secret.svg",
+    "relativePath": "resources/secret.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "StatefulSet",
+    "fileName": "sts.svg",
+    "relativePath": "resources/sts.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Service",
+    "fileName": "svc.svg",
+    "relativePath": "resources/svc.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "User",
+    "fileName": "user.svg",
+    "relativePath": "resources/user.svg"
+  },
+  {
+    "cloud": "Kubernetes",
+    "category": "Resources",
+    "subcategory": null,
+    "name": "Volume",
+    "fileName": "vol.svg",
+    "relativePath": "resources/vol.svg"
+  }
+]

@@ -1,0 +1,22 @@
+packages:
+  - '.'
+overrides:
+  '@codemirror/state': 6.7.0
+allowBuilds:
+  '@google/genai': true
+  '@parcel/watcher': true
+  esbuild: true
+  opencode-ai: true
+  protobufjs: true
+minimumReleaseAgeExclude:
+  - '@uigraph/sdk'
+  - '@anthropic-ai/claude-agent-sdk'
+  - '@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-darwin-x64@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-linux-arm64-musl@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-linux-arm64@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-linux-x64-musl@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-linux-x64@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-win32-arm64@0.3.300'
+  - '@anthropic-ai/claude-agent-sdk-win32-x64@0.3.300'
+  - '@uigraph/lens@1.0.0'

@@ -1,0 +1,709 @@
+'use client'
+
+import { VirtualCursor } from '@/components/virtual-cursor'
+import { env } from '@/env'
+import { ComponentInputType } from '@/features/component-meta'
+import { useAutoRef } from '@/hooks/use-auto-ref'
+import { cn } from '@/lib/utils'
+import { AstToUiConverter } from '@uigraph/sdk'
+import {
+  addEdge,
+  Background,
+  BackgroundVariant,
+  Connection,
+  ConnectionLineType,
+  ConnectionMode,
+  Edge,
+  FinalConnectionState,
+  MarkerType,
+  MiniMap,
+  Node,
+  ReactFlow,
+  ReactFlowInstance,
+  SelectionMode,
+  useKeyPress,
+  Viewport,
+} from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
+import * as React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { useFlowDiagramContext } from './context/flow-diagram-context'
+import { DebugNodeBounds } from './debug-node-bounds'
+import { DrawingOverlay } from './drawing-overlay'
+import { CUSTOM_EDGE_TYPES } from './edges'
+import { EdgeMarkerDefs } from './edges/edge-marker-defs'
+import { createEdgeMarker } from './edges/helpers'
+import { beautifySequenceDiagram } from './helpers/beautify-sequence-diagram'
+import { FIT_DURATION, focusNodes, MAX_ZOOM, MIN_ZOOM } from './helpers/camera'
+import { applyCollapsedFrames } from './helpers/collapse-frames'
+import { findEditorAction } from './helpers/editor-actions'
+import {
+  isCollapsedFrame,
+  isFrameNode,
+  toggleFrameCollapsed,
+} from './helpers/frame-nodes'
+import { applyHubEdgeOffsets } from './helpers/hub-edge-offsets'
+import { applyLabelCollisionOffsets } from './helpers/label-collision'
+import { applyLevelOfDetail, resolveVisibleDepth } from './helpers/lod'
+import { handleOnGroupDrag, handleOnNodeDrag } from './helpers/on-node-drag'
+import { applyParallelEdgeOffsets } from './helpers/parallel-edges'
+import { createGroupNode } from './helpers/xy-flow'
+import { useDiagramHistory } from './hooks/use-diagram-history'
+import { CUSTOM_NODE_TYPES, DatabaseTableSQLNodeData } from './nodes'
+import { componentDropDataTransfer } from './nodes/helpers/drag-data-transfer'
+import { getControlKey } from './utils/get-control-key'
+import { generateUUID } from './utils/uuid'
+
+export type ReactFlowWrapperOptions = {
+  forceAutoFitMinZoom?: number
+  forceAutoFitView?: boolean
+  forceNoBackground?: boolean
+  forceReadOnly?: boolean
+}
+
+export function ReactFlowWrapper({
+  forceAutoFitMinZoom,
+  forceNoBackground,
+  forceAutoFitView,
+  forceReadOnly,
+}: ReactFlowWrapperOptions) {
+  const {
+    viewport,
+    setViewport,
+
+    showGrid,
+    showMinimap,
+    drawingMode,
+    setDrawingMode,
+
+    edges,
+    nodes,
+    setEdges,
+    setNodes,
+    onEdgesChange,
+    onNodesChange,
+
+    reactFLowRef,
+    reactFlowInstance,
+    setReactFlowInstance,
+
+    sidebarActiveTool,
+    setSidebarActiveTool,
+
+    cursorMode,
+
+    setIsEdgeConnecting,
+
+    dataSources,
+    isPreviewing,
+    tempDiagramState,
+
+    setIsCommandPaletteOpen,
+
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+
+    isC4Diagram,
+  } = useFlowDiagramContext()
+
+  const ref = useAutoRef({
+    reactFlowInstance,
+    dataSources,
+    setIsCommandPaletteOpen,
+    viewport,
+    nodes,
+    isPreviewing,
+    setSelectedNodeIds,
+    setSelectedEdgeIds,
+  })
+
+  const viewportFrameRef = useRef<number | null>(null)
+  const pendingViewportRef = useRef<Viewport | null>(null)
+
+  const handleViewportChange = useCallback(
+    (nextViewport: Viewport) => {
+      pendingViewportRef.current = nextViewport
+
+      if (viewportFrameRef.current !== null) return
+
+      viewportFrameRef.current = requestAnimationFrame(() => {
+        viewportFrameRef.current = null
+        if (pendingViewportRef.current) setViewport(pendingViewportRef.current)
+      })
+    },
+    [setViewport]
+  )
+
+  useEffect(() => {
+    return () => {
+      if (viewportFrameRef.current === null) return
+      cancelAnimationFrame(viewportFrameRef.current)
+    }
+  }, [])
+
+  const previewVersionId = tempDiagramState?.versionId ?? null
+
+  useEffect(() => {
+    const { reactFlowInstance: rf, viewport: nextViewport } = ref.current
+    if (!rf || !nextViewport) return
+
+    void rf.setViewport(nextViewport, { duration: FIT_DURATION })
+  }, [previewVersionId, ref])
+
+  const onConnect = useCallback(
+    (params: Connection) =>
+      setEdges((eds) => {
+        if (params.source && params.target && params.source === params.target) {
+          return eds
+        }
+        return addEdge(
+          {
+            ...params,
+            type: ConnectionLineType.Bezier,
+            markerEnd: createEdgeMarker({ type: MarkerType.Arrow }),
+          },
+          eds
+        )
+      }),
+    [setEdges]
+  )
+
+  const onConnectEnd = useCallback(
+    (
+      e: MouseEvent | TouchEvent,
+      { isValid, fromNode, fromHandle, toHandle }: FinalConnectionState
+    ) => {
+      setIsEdgeConnecting(false)
+
+      if (isValid || isValid === false || !fromNode || !reactFlowInstance) {
+        return console.warn('Invalid connection state', { isValid, fromNode })
+      }
+
+      const { clientX, clientY } =
+        'changedTouches' in e ? e.changedTouches[0] : e
+
+      const el = document.elementFromPoint(
+        clientX,
+        clientY
+      ) as HTMLElement | null
+      const nodeEl = el?.closest?.('.react-flow__node') as HTMLElement | null
+
+      if (nodeEl) {
+        const toNodeId = nodeEl.getAttribute('data-id') || undefined
+        if (toNodeId && toNodeId !== fromNode.id) {
+          const toNode = nodes.find((n) => n.id === toNodeId)
+          if (toNode && !isFrameNode(toNode)) {
+            const edgeId = generateUUID()
+            return setEdges((eds) => [
+              ...eds,
+              {
+                id: edgeId,
+                source: fromNode.id,
+                target: toNodeId,
+                sourceHandle: fromHandle?.id,
+                type: ConnectionLineType.Bezier,
+                markerEnd: createEdgeMarker({ type: MarkerType.Arrow }),
+              },
+            ])
+          }
+        }
+      }
+
+      const id = generateUUID()
+
+      setNodes((nds) => [
+        ...nds,
+        {
+          id,
+          type: 'default',
+          origin: [0.5, 0.0],
+          data: {
+            componentFields: [
+              {
+                componentFieldId: 'name',
+                type: ComponentInputType.TextInput,
+                label: 'Name',
+                data: [{ value: '' }],
+              },
+            ],
+          },
+          position: reactFlowInstance.screenToFlowPosition({
+            x: clientX,
+            y: clientY,
+          }),
+        } satisfies Node,
+      ])
+
+      setEdges((eds) => [
+        ...eds,
+        {
+          id,
+          target: id,
+          source: fromNode.id,
+          targetHandle: toHandle?.id,
+          sourceHandle: fromHandle?.id,
+          type: ConnectionLineType.Bezier,
+          markerEnd: createEdgeMarker({ type: MarkerType.Arrow }),
+        },
+      ])
+    },
+    [reactFlowInstance, setEdges, setNodes, nodes, setIsEdgeConnecting]
+  )
+
+  const onConnectStart = useCallback(() => {
+    setIsEdgeConnecting(true)
+  }, [setIsEdgeConnecting])
+
+  const onReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      setEdges((eds) =>
+        eds.map((e) => {
+          if (e.id !== oldEdge.id) return e
+          const nextSource = newConnection.source ?? e.source
+          const nextTarget = newConnection.target ?? e.target
+          if (nextSource === nextTarget) return e
+          return {
+            ...e,
+            source: nextSource,
+            target: nextTarget,
+            sourceHandle: newConnection.sourceHandle ?? e.sourceHandle,
+            targetHandle: newConnection.targetHandle ?? e.targetHandle,
+          }
+        })
+      )
+    },
+    [setEdges]
+  )
+
+  const onReconnectStart = useCallback(() => {
+    setIsEdgeConnecting(true)
+  }, [setIsEdgeConnecting])
+
+  const onReconnectEnd = useCallback(() => {
+    setIsEdgeConnecting(false)
+  }, [setIsEdgeConnecting])
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  }, [])
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      if (!reactFlowInstance) return
+      if (isPreviewing) return
+
+      event.preventDefault()
+
+      const node = componentDropDataTransfer(event.dataTransfer)
+      if (!node) return toast.error('Invalid node')
+
+      const newNode = {
+        ...node,
+        position: reactFlowInstance.screenToFlowPosition({
+          x: event.clientX - 24,
+          y: event.clientY - 24,
+        }),
+      }
+
+      if (isFrameNode(newNode)) {
+        setNodes((nds) => [newNode, ...nds])
+      } else {
+        reactFlowInstance.addNodes([newNode])
+        handleOnNodeDrag(event, newNode, reactFlowInstance)
+
+        if (
+          newNode.type === 'databaseTableSQL' &&
+          'localTable' in newNode.data
+        ) {
+          console.log('Mutating database table', newNode)
+
+          const { dataSources } = ref.current
+
+          const nodes = reactFlowInstance.getNodes()
+          const edges = reactFlowInstance.getEdges()
+          const tableName = (newNode.data as DatabaseTableSQLNodeData)
+            .localTable?.tableName
+          const databaseName = (newNode.data as DatabaseTableSQLNodeData)
+            .localTable?.databaseName
+
+          const schema = dataSources.find(
+            (ds) => ds.name === databaseName
+          )?.schemaAst
+
+          if (tableName && databaseName && schema) {
+            const updated = AstToUiConverter.updateReactFlow({
+              edges,
+              nodes: [...nodes, newNode],
+              sourceName: databaseName,
+              schema,
+              oldDataSources: dataSources,
+            })
+
+            console.log('Updating edges', updated.edges)
+            setEdges(updated.edges)
+          }
+        }
+      }
+    },
+    [ref, reactFlowInstance, isPreviewing, setNodes, setEdges]
+  )
+
+  const onPaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (!reactFlowInstance) return
+      if (isPreviewing) return
+      if (sidebarActiveTool !== 'add-comment') return
+
+      const id = generateUUID()
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+
+      setNodes((nds: Node[]) => [
+        ...nds,
+        {
+          id,
+          type: 'comment',
+          data: { message: '' },
+          position,
+        } as Node,
+      ])
+
+      setSidebarActiveTool(null)
+    },
+    [
+      reactFlowInstance,
+      isPreviewing,
+      sidebarActiveTool,
+      setNodes,
+      setSidebarActiveTool,
+    ]
+  )
+
+  const onDrawComplete = useCallback(
+    (bounds: { x: number; y: number; width: number; height: number }) => {
+      if (!reactFlowInstance) return
+      const projected = reactFlowInstance.screenToFlowPosition({
+        x: bounds.x,
+        y: bounds.y,
+      })
+
+      const flowBounds = {
+        ...projected,
+        width: bounds.width / reactFlowInstance.getZoom(),
+        height: bounds.height / reactFlowInstance.getZoom(),
+      }
+
+      const nodesInBounds = nodes.filter((node: Node) => {
+        if (isFrameNode(node) || node.type === 'comment' || node.parentId) {
+          return false
+        }
+
+        const nodeRight = node.position.x
+        const nodeBottom = node.position.y
+        const boundsRight = flowBounds.x + flowBounds.width
+        const boundsBottom = flowBounds.y + flowBounds.height
+        return (
+          node.position.x >= flowBounds.x &&
+          node.position.y >= flowBounds.y &&
+          nodeRight <= boundsRight &&
+          nodeBottom <= boundsBottom
+        )
+      })
+
+      const nodesInBoundsIds = nodesInBounds.map((n) => n.id)
+
+      if (nodesInBounds.length > 0) {
+        const groupNode = createGroupNode(flowBounds, nodesInBoundsIds)
+        setNodes((nds: Node[]) => [
+          groupNode,
+
+          ...nds.map((n: Node) => {
+            if (nodesInBoundsIds.includes(n.id)) {
+              return {
+                ...n,
+                parentId: groupNode.id,
+                position: {
+                  x: n.position.x - flowBounds.x,
+                  y: n.position.y - flowBounds.y,
+                },
+              }
+            }
+
+            return n
+          }),
+        ])
+      }
+
+      setDrawingMode(false)
+    },
+    [reactFlowInstance, nodes, setNodes, setDrawingMode]
+  )
+
+  const onNodeDragStop = useCallback(
+    (event: MouseEvent | TouchEvent, node: Node) => {
+      if (!reactFlowInstance) return
+
+      if (isFrameNode(node)) {
+        handleOnGroupDrag(node, reactFlowInstance)
+      } else if (node.id.startsWith('message-')) {
+        const { nodes: beautified, edges: beautifiedEdges } =
+          beautifySequenceDiagram(
+            reactFlowInstance.getNodes(),
+            reactFlowInstance.getEdges()
+          )
+        setNodes(beautified)
+        setEdges(beautifiedEdges)
+      } else {
+        handleOnNodeDrag(
+          event as unknown as React.MouseEvent,
+          node,
+          reactFlowInstance
+        )
+      }
+    },
+    [reactFlowInstance, setNodes, setEdges]
+  )
+
+  const [visibleDepth, setVisibleDepth] = useState<number>(Infinity)
+
+  useEffect(() => {
+    setVisibleDepth((prev) => resolveVisibleDepth(viewport?.zoom ?? 1, prev))
+  }, [viewport?.zoom])
+
+  const lodDepth = isC4Diagram ? visibleDepth : Infinity
+
+  const detailed = useMemo(() => {
+    const lod = applyLevelOfDetail(nodes, edges, lodDepth)
+    const collapsed = applyCollapsedFrames(lod.nodes, lod.edges)
+
+    return {
+      nodes: collapsed.nodes,
+      edges: applyLabelCollisionOffsets(
+        collapsed.nodes,
+        applyHubEdgeOffsets(
+          collapsed.nodes,
+          applyParallelEdgeOffsets(collapsed.edges)
+        )
+      ),
+    }
+  }, [nodes, edges, lodDepth])
+
+  const spacePanning = useKeyPress('Space')
+
+  const isNodeWritable = !drawingMode && !forceReadOnly && !isPreviewing
+
+  const { undo, redo } = useDiagramHistory({
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    enabled: isNodeWritable,
+  })
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement
+      const isTyping =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+
+      const isCtrlOrCmd = event.ctrlKey || event.metaKey
+      const isEditingNodeLabel =
+        isTyping &&
+        target.closest('.react-flow__node') !== null &&
+        target.closest('.react-flow__node-comment') === null
+      const canUndoRedo = !isTyping || isEditingNodeLabel
+
+      if (isCtrlOrCmd && !event.shiftKey && event.key === 'z' && canUndoRedo) {
+        event.preventDefault()
+        event.stopPropagation()
+        undo()
+        return
+      }
+
+      if (
+        isCtrlOrCmd &&
+        (event.key === 'y' || (event.shiftKey && event.key === 'z')) &&
+        canUndoRedo
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
+        redo()
+        return
+      }
+
+      const action = findEditorAction(event)
+      const rf = ref.current.reactFlowInstance
+
+      function buildActionContext(rf: ReactFlowInstance) {
+        return {
+          rf,
+          openCommandPalette: () => ref.current.setIsCommandPaletteOpen(true),
+          selectAllNodes: () => {
+            if (ref.current.isPreviewing) return
+
+            ref.current.setSelectedNodeIds(
+              ref.current.nodes.map((node) => node.id)
+            )
+            ref.current.setSelectedEdgeIds([])
+          },
+        }
+      }
+
+      if (isTyping) {
+        if (action?.allowInInput && rf) {
+          if (action.preventDefault) event.preventDefault()
+
+          void action.handler(buildActionContext(rf))
+        }
+
+        return
+      }
+
+      if (action && rf) {
+        if (action.preventDefault) {
+          event.preventDefault()
+        }
+
+        void action.handler(buildActionContext(rf))
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown, { capture: true })
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, { capture: true })
+    }
+  }, [ref, undo, redo])
+
+  return (
+    <>
+      {sidebarActiveTool === 'add-comment' && <VirtualCursor />}
+
+      {isPreviewing && (
+        <style>{`
+          .diagram-preview-locked .react-flow__node,
+          .diagram-preview-locked .react-flow__node *,
+          .diagram-preview-locked .react-flow__edge,
+          .diagram-preview-locked .react-flow__edge * {
+            pointer-events: none !important;
+            user-select: none !important;
+          }
+        `}</style>
+      )}
+      <ReactFlow
+        ref={reactFLowRef}
+        nodeTypes={CUSTOM_NODE_TYPES}
+        edgeTypes={CUSTOM_EDGE_TYPES}
+        selectionMode={SelectionMode.Partial}
+        selectNodesOnDrag={false}
+        panOnDrag={cursorMode === 'pan' || spacePanning ? true : [1, 2]}
+        selectionOnDrag={cursorMode === 'select' && !spacePanning}
+        panOnScroll={cursorMode === 'select'}
+        noWheelClassName="skip-wheel"
+        nodes={detailed.nodes}
+        edges={detailed.edges}
+        onDrop={onDrop}
+        onConnect={onConnect}
+        onConnectEnd={onConnectEnd}
+        onConnectStart={onConnectStart}
+        onDragOver={onDragOver}
+        onPaneClick={onPaneClick}
+        onReconnect={onReconnect}
+        onReconnectStart={onReconnectStart}
+        onReconnectEnd={onReconnectEnd}
+        onNodeDragStop={onNodeDragStop}
+        isValidConnection={(c) => {
+          if (!c.source || !c.target) return true
+          return c.source !== c.target
+        }}
+        selectionKeyCode={getControlKey()}
+        multiSelectionKeyCode={getControlKey()}
+        className={cn(
+          'relative isolate opacity-0 transition-opacity duration-100',
+          reactFlowInstance && 'opacity-100',
+          lodDepth !== Infinity && 'lod-active',
+          spacePanning && 'space-panning',
+          sidebarActiveTool === 'add-comment' &&
+            'cursor-none! [&_*]:cursor-none!',
+
+          isPreviewing && 'diagram-preview-locked'
+        )}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        connectionMode={ConnectionMode.Strict}
+        connectionLineStyle={{ strokeWidth: 3 }}
+        defaultEdgeOptions={{ type: 'default', style: { strokeWidth: 3 } }}
+        defaultViewport={viewport ?? undefined}
+        onViewportChange={handleViewportChange}
+        onMoveEnd={(_, nextViewport) => setViewport(nextViewport)}
+        onNodeDoubleClick={(_, node) => {
+          if (isCollapsedFrame(node)) {
+            return setNodes((prev) => toggleFrameCollapsed(prev, node.id))
+          }
+
+          const rf = ref.current.reactFlowInstance
+          if (node.type !== 'c4Boundary' || !rf) return
+
+          focusNodes(rf, [node.id])
+        }}
+        onInit={async (rf) => {
+          const isEmpty =
+            rf.getNodes().length === 0 && rf.getEdges().length === 0
+
+          if (!isEmpty && forceAutoFitView) {
+            await rf.fitView(
+              forceAutoFitView
+                ? { padding: '20px', minZoom: forceAutoFitMinZoom }
+                : { maxZoom: 0.8, minZoom: 0.8 }
+            )
+          }
+
+          setViewport(rf.getViewport())
+          setReactFlowInstance(rf)
+        }}
+        onPointerDown={() => {
+          setSidebarActiveTool((prev) => (prev === 'add-comment' ? prev : null))
+        }}
+        nodesDraggable={isNodeWritable && !spacePanning}
+        nodesConnectable={isNodeWritable && !spacePanning}
+        elementsSelectable={isNodeWritable && !spacePanning}
+        edgesReconnectable={isNodeWritable}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
+      >
+        <EdgeMarkerDefs />
+
+        {showMinimap && (
+          <MiniMap
+            className="!border !border-[#2A3242] !bg-[#141925] !shadow-sm"
+            maskColor="rgb(11 14 22 / 0.75)"
+            nodeColor="#3859FF"
+          />
+        )}
+
+        {!forceNoBackground && showGrid && (
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={12}
+            size={1}
+            color="#2A3242"
+          />
+        )}
+
+        <DrawingOverlay
+          isDrawing={drawingMode && !isPreviewing}
+          onDrawComplete={onDrawComplete}
+        />
+
+        {env.VITE_FEATURE_ENABLE_DEBUG_DIAGRAM_NODE_BOUNDS && (
+          <DebugNodeBounds />
+        )}
+      </ReactFlow>
+    </>
+  )
+}

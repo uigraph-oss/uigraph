@@ -1,0 +1,8 @@
+type Actor {
+  id: ID!
+  type: String!
+  name: String!
+  email: String
+  disabled: Boolean!
+  avatarUrl: String
+}

@@ -1,0 +1,1730 @@
+[
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Access Context Manager",
+    "fileName": "access_context_manager.svg",
+    "relativePath": "services/access_context_manager/access_context_manager.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Administration",
+    "fileName": "administration.svg",
+    "relativePath": "services/administration/administration.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Advanced Agent Modeling",
+    "fileName": "advanced_agent_modeling.svg",
+    "relativePath": "services/advanced_agent_modeling/advanced_agent_modeling.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Advanced Solutions Lab",
+    "fileName": "advanced_solutions_lab.svg",
+    "relativePath": "services/advanced_solutions_lab/advanced_solutions_lab.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Agent Assist",
+    "fileName": "agent_assist.svg",
+    "relativePath": "services/agent_assist/agent_assist.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AI Hub",
+    "fileName": "ai_hub.svg",
+    "relativePath": "services/ai_hub/ai_hub.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AI Platform",
+    "fileName": "ai_platform.svg",
+    "relativePath": "services/ai_platform/ai_platform.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AI Platform Unified",
+    "fileName": "ai_platform_unified.svg",
+    "relativePath": "services/ai_platform_unified/ai_platform_unified.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Analytics Hub",
+    "fileName": "analytics_hub.svg",
+    "relativePath": "services/analytics_hub/analytics_hub.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Anthos",
+    "fileName": "anthos.svg",
+    "relativePath": "services/anthos/anthos.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Anthos Config Management",
+    "fileName": "anthos_config_management.svg",
+    "relativePath": "services/anthos_config_management/anthos_config_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Anthos Service Mesh",
+    "fileName": "anthos_service_mesh.svg",
+    "relativePath": "services/anthos_service_mesh/anthos_service_mesh.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "API",
+    "fileName": "api.svg",
+    "relativePath": "services/api/api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "API Analytics",
+    "fileName": "api_analytics.svg",
+    "relativePath": "services/api_analytics/api_analytics.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "API Monetization",
+    "fileName": "api_monetization.svg",
+    "relativePath": "services/api_monetization/api_monetization.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Apigee API Platform",
+    "fileName": "apigee_api_platform.svg",
+    "relativePath": "services/apigee_api_platform/apigee_api_platform.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Apigee Sense",
+    "fileName": "apigee_sense.svg",
+    "relativePath": "services/apigee_sense/apigee_sense.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "App Engine",
+    "fileName": "app_engine.svg",
+    "relativePath": "services/app_engine/app_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Artifact Registry",
+    "fileName": "artifact_registry.svg",
+    "relativePath": "services/artifact_registry/artifact_registry.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Asset Inventory",
+    "fileName": "asset_inventory.svg",
+    "relativePath": "services/asset_inventory/asset_inventory.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Assured Workloads",
+    "fileName": "assured_workloads.svg",
+    "relativePath": "services/assured_workloads/assured_workloads.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML",
+    "fileName": "automl.svg",
+    "relativePath": "services/automl/automl.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML Natural Language",
+    "fileName": "automl_natural_language.svg",
+    "relativePath": "services/automl_natural_language/automl_natural_language.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML Tables",
+    "fileName": "automl_tables.svg",
+    "relativePath": "services/automl_tables/automl_tables.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML Translation",
+    "fileName": "automl_translation.svg",
+    "relativePath": "services/automl_translation/automl_translation.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML Video Intelligence",
+    "fileName": "automl_video_intelligence.svg",
+    "relativePath": "services/automl_video_intelligence/automl_video_intelligence.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "AutoML Vision",
+    "fileName": "automl_vision.svg",
+    "relativePath": "services/automl_vision/automl_vision.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Bare Metal Solutions",
+    "fileName": "bare_metal_solutions.svg",
+    "relativePath": "services/bare_metal_solutions/bare_metal_solutions.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Batch",
+    "fileName": "batch.svg",
+    "relativePath": "services/batch/batch.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "BeyondCorp",
+    "fileName": "beyondcorp.svg",
+    "relativePath": "services/beyondcorp/beyondcorp.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "BigQuery",
+    "fileName": "bigquery.svg",
+    "relativePath": "services/bigquery/bigquery.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Bigtable",
+    "fileName": "bigtable.svg",
+    "relativePath": "services/bigtable/bigtable.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Billing",
+    "fileName": "billing.svg",
+    "relativePath": "services/billing/billing.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Binary Authorization",
+    "fileName": "binary_authorization.svg",
+    "relativePath": "services/binary_authorization/binary_authorization.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Catalog",
+    "fileName": "catalog.svg",
+    "relativePath": "services/catalog/catalog.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Certificate Authority Service",
+    "fileName": "certificate_authority_service.svg",
+    "relativePath": "services/certificate_authority_service/certificate_authority_service.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Certificate Manager",
+    "fileName": "certificate_manager.svg",
+    "relativePath": "services/certificate_manager/certificate_manager.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud API Gateway",
+    "fileName": "cloud_api_gateway.svg",
+    "relativePath": "services/cloud_api_gateway/cloud_api_gateway.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud APIs",
+    "fileName": "cloud_apis.svg",
+    "relativePath": "services/cloud_apis/cloud_apis.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Armor",
+    "fileName": "cloud_armor.svg",
+    "relativePath": "services/cloud_armor/cloud_armor.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Asset Inventory",
+    "fileName": "cloud_asset_inventory.svg",
+    "relativePath": "services/cloud_asset_inventory/cloud_asset_inventory.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Audit Logs",
+    "fileName": "cloud_audit_logs.svg",
+    "relativePath": "services/cloud_audit_logs/cloud_audit_logs.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Build",
+    "fileName": "cloud_build.svg",
+    "relativePath": "services/cloud_build/cloud_build.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud CDN",
+    "fileName": "cloud_cdn.svg",
+    "relativePath": "services/cloud_cdn/cloud_cdn.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Code",
+    "fileName": "cloud_code.svg",
+    "relativePath": "services/cloud_code/cloud_code.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Composer",
+    "fileName": "cloud_composer.svg",
+    "relativePath": "services/cloud_composer/cloud_composer.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Data Fusion",
+    "fileName": "cloud_data_fusion.svg",
+    "relativePath": "services/cloud_data_fusion/cloud_data_fusion.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Deploy",
+    "fileName": "cloud_deploy.svg",
+    "relativePath": "services/cloud_deploy/cloud_deploy.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Deployment Manager",
+    "fileName": "cloud_deployment_manager.svg",
+    "relativePath": "services/cloud_deployment_manager/cloud_deployment_manager.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud DNS",
+    "fileName": "cloud_dns.svg",
+    "relativePath": "services/cloud_dns/cloud_dns.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Domains",
+    "fileName": "cloud_domains.svg",
+    "relativePath": "services/cloud_domains/cloud_domains.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud EKM",
+    "fileName": "cloud_ekm.svg",
+    "relativePath": "services/cloud_ekm/cloud_ekm.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Endpoints",
+    "fileName": "cloud_endpoints.svg",
+    "relativePath": "services/cloud_endpoints/cloud_endpoints.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud External IP Addresses",
+    "fileName": "cloud_external_ip_addresses.svg",
+    "relativePath": "services/cloud_external_ip_addresses/cloud_external_ip_addresses.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Firewall Rules",
+    "fileName": "cloud_firewall_rules.svg",
+    "relativePath": "services/cloud_firewall_rules/cloud_firewall_rules.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud for Marketing",
+    "fileName": "cloud_for_marketing.svg",
+    "relativePath": "services/cloud_for_marketing/cloud_for_marketing.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Functions",
+    "fileName": "cloud_functions.svg",
+    "relativePath": "services/cloud_functions/cloud_functions.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Generic",
+    "fileName": "cloud_generic.svg",
+    "relativePath": "services/cloud_generic/cloud_generic.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud GPU",
+    "fileName": "cloud_gpu.svg",
+    "relativePath": "services/cloud_gpu/cloud_gpu.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Healthcare API",
+    "fileName": "cloud_healthcare_api.svg",
+    "relativePath": "services/cloud_healthcare_api/cloud_healthcare_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Healthcare Marketplace",
+    "fileName": "cloud_healthcare_marketplace.svg",
+    "relativePath": "services/cloud_healthcare_marketplace/cloud_healthcare_marketplace.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud HSM",
+    "fileName": "cloud_hsm.svg",
+    "relativePath": "services/cloud_hsm/cloud_hsm.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud IDS",
+    "fileName": "cloud_ids.svg",
+    "relativePath": "services/cloud_ids/cloud_ids.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Inference API",
+    "fileName": "cloud_inference_api.svg",
+    "relativePath": "services/cloud_inference_api/cloud_inference_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Interconnect",
+    "fileName": "cloud_interconnect.svg",
+    "relativePath": "services/cloud_interconnect/cloud_interconnect.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Jobs API",
+    "fileName": "cloud_jobs_api.svg",
+    "relativePath": "services/cloud_jobs_api/cloud_jobs_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Load Balancing",
+    "fileName": "cloud_load_balancing.svg",
+    "relativePath": "services/cloud_load_balancing/cloud_load_balancing.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Logging",
+    "fileName": "cloud_logging.svg",
+    "relativePath": "services/cloud_logging/cloud_logging.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Media Edge",
+    "fileName": "cloud_media_edge.svg",
+    "relativePath": "services/cloud_media_edge/cloud_media_edge.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Monitoring",
+    "fileName": "cloud_monitoring.svg",
+    "relativePath": "services/cloud_monitoring/cloud_monitoring.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud NAT",
+    "fileName": "cloud_nat.svg",
+    "relativePath": "services/cloud_nat/cloud_nat.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Natural Language API",
+    "fileName": "cloud_natural_language_api.svg",
+    "relativePath": "services/cloud_natural_language_api/cloud_natural_language_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Network",
+    "fileName": "cloud_network.svg",
+    "relativePath": "services/cloud_network/cloud_network.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Ops",
+    "fileName": "cloud_ops.svg",
+    "relativePath": "services/cloud_ops/cloud_ops.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Optimization AI",
+    "fileName": "cloud_optimization_ai.svg",
+    "relativePath": "services/cloud_optimization_ai/cloud_optimization_ai.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Optimization AI - Fleet Routing API",
+    "fileName": "cloud_optimization_ai_-_fleet_routing_api.svg",
+    "relativePath": "services/cloud_optimization_ai_-_fleet_routing_api/cloud_optimization_ai_-_fleet_routing_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Router",
+    "fileName": "cloud_router.svg",
+    "relativePath": "services/cloud_router/cloud_router.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Routes",
+    "fileName": "cloud_routes.svg",
+    "relativePath": "services/cloud_routes/cloud_routes.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Run",
+    "fileName": "cloud_run.svg",
+    "relativePath": "services/cloud_run/cloud_run.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Run for Anthos",
+    "fileName": "cloud_run_for_anthos.svg",
+    "relativePath": "services/cloud_run_for_anthos/cloud_run_for_anthos.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Scheduler",
+    "fileName": "cloud_scheduler.svg",
+    "relativePath": "services/cloud_scheduler/cloud_scheduler.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Security Scanner",
+    "fileName": "cloud_security_scanner.svg",
+    "relativePath": "services/cloud_security_scanner/cloud_security_scanner.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Shell",
+    "fileName": "cloud_shell.svg",
+    "relativePath": "services/cloud_shell/cloud_shell.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Spanner",
+    "fileName": "cloud_spanner.svg",
+    "relativePath": "services/cloud_spanner/cloud_spanner.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud SQL",
+    "fileName": "cloud_sql.svg",
+    "relativePath": "services/cloud_sql/cloud_sql.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Storage",
+    "fileName": "cloud_storage.svg",
+    "relativePath": "services/cloud_storage/cloud_storage.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Tasks",
+    "fileName": "cloud_tasks.svg",
+    "relativePath": "services/cloud_tasks/cloud_tasks.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Test Lab",
+    "fileName": "cloud_test_lab.svg",
+    "relativePath": "services/cloud_test_lab/cloud_test_lab.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud TPU",
+    "fileName": "cloud_tpu.svg",
+    "relativePath": "services/cloud_tpu/cloud_tpu.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Translation API",
+    "fileName": "cloud_translation_api.svg",
+    "relativePath": "services/cloud_translation_api/cloud_translation_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud Vision API",
+    "fileName": "cloud_vision_api.svg",
+    "relativePath": "services/cloud_vision_api/cloud_vision_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Cloud VPN",
+    "fileName": "cloud_vpn.svg",
+    "relativePath": "services/cloud_vpn/cloud_vpn.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Compute Engine",
+    "fileName": "compute_engine.svg",
+    "relativePath": "services/compute_engine/compute_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Configuration Management",
+    "fileName": "configuration_management.svg",
+    "relativePath": "services/configuration_management/configuration_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Connectivity Test",
+    "fileName": "connectivity_test.svg",
+    "relativePath": "services/connectivity_test/connectivity_test.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Connectors",
+    "fileName": "connectors.svg",
+    "relativePath": "services/connectors/connectors.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Contact Center AI",
+    "fileName": "contact_center_ai.svg",
+    "relativePath": "services/contact_center_ai/contact_center_ai.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Container Optimized OS",
+    "fileName": "container_optimized_os.svg",
+    "relativePath": "services/container_optimized_os/container_optimized_os.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Container Registry",
+    "fileName": "container_registry.svg",
+    "relativePath": "services/container_registry/container_registry.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Catalog",
+    "fileName": "data_catalog.svg",
+    "relativePath": "services/data_catalog/data_catalog.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Labeling",
+    "fileName": "data_labeling.svg",
+    "relativePath": "services/data_labeling/data_labeling.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Layers",
+    "fileName": "data_layers.svg",
+    "relativePath": "services/data_layers/data_layers.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Loss Prevention API",
+    "fileName": "data_loss_prevention_api.svg",
+    "relativePath": "services/data_loss_prevention_api/data_loss_prevention_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data QnA",
+    "fileName": "data_qna.svg",
+    "relativePath": "services/data_qna/data_qna.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Studio",
+    "fileName": "data_studio.svg",
+    "relativePath": "services/data_studio/data_studio.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Data Transfer",
+    "fileName": "data_transfer.svg",
+    "relativePath": "services/data_transfer/data_transfer.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Database Migration Service",
+    "fileName": "database_migration_service.svg",
+    "relativePath": "services/database_migration_service/database_migration_service.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dataflow",
+    "fileName": "dataflow.svg",
+    "relativePath": "services/dataflow/dataflow.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Datalab",
+    "fileName": "datalab.svg",
+    "relativePath": "services/datalab/datalab.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dataplex",
+    "fileName": "dataplex.svg",
+    "relativePath": "services/dataplex/dataplex.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "DataPol",
+    "fileName": "datapol.svg",
+    "relativePath": "services/datapol/datapol.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dataprep",
+    "fileName": "dataprep.svg",
+    "relativePath": "services/dataprep/dataprep.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dataproc",
+    "fileName": "dataproc.svg",
+    "relativePath": "services/dataproc/dataproc.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dataproc Metastore",
+    "fileName": "dataproc_metastore.svg",
+    "relativePath": "services/dataproc_metastore/dataproc_metastore.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Datashare",
+    "fileName": "datashare.svg",
+    "relativePath": "services/datashare/datashare.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Datastore",
+    "fileName": "datastore.svg",
+    "relativePath": "services/datastore/datastore.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Datastream",
+    "fileName": "datastream.svg",
+    "relativePath": "services/datastream/datastream.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Debugger",
+    "fileName": "debugger.svg",
+    "relativePath": "services/debugger/debugger.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Developer Portal",
+    "fileName": "developer_portal.svg",
+    "relativePath": "services/developer_portal/developer_portal.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dialogflow",
+    "fileName": "dialogflow.svg",
+    "relativePath": "services/dialogflow/dialogflow.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dialogflow CX",
+    "fileName": "dialogflow_cx.svg",
+    "relativePath": "services/dialogflow_cx/dialogflow_cx.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Dialogflow Insights",
+    "fileName": "dialogflow_insights.svg",
+    "relativePath": "services/dialogflow_insights/dialogflow_insights.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Document AI",
+    "fileName": "document_ai.svg",
+    "relativePath": "services/document_ai/document_ai.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Early Access Center",
+    "fileName": "early_access_center.svg",
+    "relativePath": "services/early_access_center/early_access_center.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Error Reporting",
+    "fileName": "error_reporting.svg",
+    "relativePath": "services/error_reporting/error_reporting.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Eventarc",
+    "fileName": "eventarc.svg",
+    "relativePath": "services/eventarc/eventarc.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Filestore",
+    "fileName": "filestore.svg",
+    "relativePath": "services/filestore/filestore.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Financial Services Marketplace",
+    "fileName": "financial_services_marketplace.svg",
+    "relativePath": "services/financial_services_marketplace/financial_services_marketplace.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Firestore",
+    "fileName": "firestore.svg",
+    "relativePath": "services/firestore/firestore.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Fleet Engine",
+    "fileName": "fleet_engine.svg",
+    "relativePath": "services/fleet_engine/fleet_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Free Trial",
+    "fileName": "free_trial.svg",
+    "relativePath": "services/free_trial/free_trial.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Game Servers",
+    "fileName": "game_servers.svg",
+    "relativePath": "services/game_servers/game_servers.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "GCE Systems Management",
+    "fileName": "gce_systems_management.svg",
+    "relativePath": "services/gce_systems_management/gce_systems_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Genomics",
+    "fileName": "genomics.svg",
+    "relativePath": "services/genomics/genomics.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "GKE On-Prem",
+    "fileName": "gke_on-prem.svg",
+    "relativePath": "services/gke_on-prem/gke_on-prem.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Google Cloud Marketplace",
+    "fileName": "google_cloud_marketplace.svg",
+    "relativePath": "services/google_cloud_marketplace/google_cloud_marketplace.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Google Kubernetes Engine",
+    "fileName": "google_kubernetes_engine.svg",
+    "relativePath": "services/google_kubernetes_engine/google_kubernetes_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Google Maps Platform",
+    "fileName": "google_maps_platform.svg",
+    "relativePath": "services/google_maps_platform/google_maps_platform.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Healthcare NLP API",
+    "fileName": "healthcare_nlp_api.svg",
+    "relativePath": "services/healthcare_nlp_api/healthcare_nlp_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Home",
+    "fileName": "home.svg",
+    "relativePath": "services/home/home.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Identity-Aware Proxy",
+    "fileName": "identity-aware_proxy.svg",
+    "relativePath": "services/identity-aware_proxy/identity-aware_proxy.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Identity and Access Management",
+    "fileName": "identity_and_access_management.svg",
+    "relativePath": "services/identity_and_access_management/identity_and_access_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Identity Platform",
+    "fileName": "identity_platform.svg",
+    "relativePath": "services/identity_platform/identity_platform.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "IoT Core",
+    "fileName": "iot_core.svg",
+    "relativePath": "services/iot_core/iot_core.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "IoT Edge",
+    "fileName": "iot_edge.svg",
+    "relativePath": "services/iot_edge/iot_edge.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Key Access Justifications",
+    "fileName": "key_access_justifications.svg",
+    "relativePath": "services/key_access_justifications/key_access_justifications.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Key Management Service",
+    "fileName": "key_management_service.svg",
+    "relativePath": "services/key_management_service/key_management_service.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "KubeRun",
+    "fileName": "kuberun.svg",
+    "relativePath": "services/kuberun/kuberun.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Launcher",
+    "fileName": "launcher.svg",
+    "relativePath": "services/launcher/launcher.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Local SSD",
+    "fileName": "local_ssd.svg",
+    "relativePath": "services/local_ssd/local_ssd.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Looker",
+    "fileName": "looker.svg",
+    "relativePath": "services/looker/looker.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Managed Service for Microsoft Active Directory",
+    "fileName": "managed_service_for_microsoft_active_directory.svg",
+    "relativePath": "services/managed_service_for_microsoft_active_directory/managed_service_for_microsoft_active_directory.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Media Translation API",
+    "fileName": "media_translation_api.svg",
+    "relativePath": "services/media_translation_api/media_translation_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Memorystore",
+    "fileName": "memorystore.svg",
+    "relativePath": "services/memorystore/memorystore.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Migrate for Anthos",
+    "fileName": "migrate_for_anthos.svg",
+    "relativePath": "services/migrate_for_anthos/migrate_for_anthos.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Migrate for Compute Engine",
+    "fileName": "migrate_for_compute_engine.svg",
+    "relativePath": "services/migrate_for_compute_engine/migrate_for_compute_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "My Cloud",
+    "fileName": "my_cloud.svg",
+    "relativePath": "services/my_cloud/my_cloud.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Network Connectivity Center",
+    "fileName": "network_connectivity_center.svg",
+    "relativePath": "services/network_connectivity_center/network_connectivity_center.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Network Intelligence Center",
+    "fileName": "network_intelligence_center.svg",
+    "relativePath": "services/network_intelligence_center/network_intelligence_center.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Network Security",
+    "fileName": "network_security.svg",
+    "relativePath": "services/network_security/network_security.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Network Tiers",
+    "fileName": "network_tiers.svg",
+    "relativePath": "services/network_tiers/network_tiers.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Network Topology",
+    "fileName": "network_topology.svg",
+    "relativePath": "services/network_topology/network_topology.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Onboarding",
+    "fileName": "onboarding.svg",
+    "relativePath": "services/onboarding/onboarding.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "OS Configuration Management",
+    "fileName": "os_configuration_management.svg",
+    "relativePath": "services/os_configuration_management/os_configuration_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "OS Inventory Management",
+    "fileName": "os_inventory_management.svg",
+    "relativePath": "services/os_inventory_management/os_inventory_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "OS Patch Management",
+    "fileName": "os_patch_management.svg",
+    "relativePath": "services/os_patch_management/os_patch_management.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Partner Interconnect",
+    "fileName": "partner_interconnect.svg",
+    "relativePath": "services/partner_interconnect/partner_interconnect.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Partner Portal",
+    "fileName": "partner_portal.svg",
+    "relativePath": "services/partner_portal/partner_portal.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Performance Dashboard",
+    "fileName": "performance_dashboard.svg",
+    "relativePath": "services/performance_dashboard/performance_dashboard.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Permissions",
+    "fileName": "permissions.svg",
+    "relativePath": "services/permissions/permissions.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Persistent Disk",
+    "fileName": "persistent_disk.svg",
+    "relativePath": "services/persistent_disk/persistent_disk.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Phishing Protection",
+    "fileName": "phishing_protection.svg",
+    "relativePath": "services/phishing_protection/phishing_protection.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Policy Analyzer",
+    "fileName": "policy_analyzer.svg",
+    "relativePath": "services/policy_analyzer/policy_analyzer.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Premium Network Tier",
+    "fileName": "premium_network_tier.svg",
+    "relativePath": "services/premium_network_tier/premium_network_tier.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Private Connectivity",
+    "fileName": "private_connectivity.svg",
+    "relativePath": "services/private_connectivity/private_connectivity.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Private Service Connect",
+    "fileName": "private_service_connect.svg",
+    "relativePath": "services/private_service_connect/private_service_connect.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Producer Portal",
+    "fileName": "producer_portal.svg",
+    "relativePath": "services/producer_portal/producer_portal.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Profiler",
+    "fileName": "profiler.svg",
+    "relativePath": "services/profiler/profiler.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Project",
+    "fileName": "project.svg",
+    "relativePath": "services/project/project.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Pub/Sub",
+    "fileName": "pubsub.svg",
+    "relativePath": "services/pubsub/pubsub.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Quantum Engine",
+    "fileName": "quantum_engine.svg",
+    "relativePath": "services/quantum_engine/quantum_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Quotas",
+    "fileName": "quotas.svg",
+    "relativePath": "services/quotas/quotas.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Real-World Insights",
+    "fileName": "real-world_insights.svg",
+    "relativePath": "services/real-world_insights/real-world_insights.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Recommendations AI",
+    "fileName": "recommendations_ai.svg",
+    "relativePath": "services/recommendations_ai/recommendations_ai.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Release Notes",
+    "fileName": "release_notes.svg",
+    "relativePath": "services/release_notes/release_notes.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Retail API",
+    "fileName": "retail_api.svg",
+    "relativePath": "services/retail_api/retail_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Risk Manager",
+    "fileName": "risk_manager.svg",
+    "relativePath": "services/risk_manager/risk_manager.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Runtime Config",
+    "fileName": "runtime_config.svg",
+    "relativePath": "services/runtime_config/runtime_config.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Secret Manager",
+    "fileName": "secret_manager.svg",
+    "relativePath": "services/secret_manager/secret_manager.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Security",
+    "fileName": "security.svg",
+    "relativePath": "services/security/security.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Security Command Center",
+    "fileName": "security_command_center.svg",
+    "relativePath": "services/security_command_center/security_command_center.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Security Health Advisor",
+    "fileName": "security_health_advisor.svg",
+    "relativePath": "services/security_health_advisor/security_health_advisor.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Security Key Enforcement",
+    "fileName": "security_key_enforcement.svg",
+    "relativePath": "services/security_key_enforcement/security_key_enforcement.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Service Discovery",
+    "fileName": "service_discovery.svg",
+    "relativePath": "services/service_discovery/service_discovery.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Speech-to-Text",
+    "fileName": "speech-to-text.svg",
+    "relativePath": "services/speech-to-text/speech-to-text.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Stackdriver",
+    "fileName": "stackdriver.svg",
+    "relativePath": "services/stackdriver/stackdriver.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Standard Network Tier",
+    "fileName": "standard_network_tier.svg",
+    "relativePath": "services/standard_network_tier/standard_network_tier.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Stream Suite",
+    "fileName": "stream_suite.svg",
+    "relativePath": "services/stream_suite/stream_suite.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Support",
+    "fileName": "support.svg",
+    "relativePath": "services/support/support.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "TensorFlow Enterprise",
+    "fileName": "tensorflow_enterprise.svg",
+    "relativePath": "services/tensorflow_enterprise/tensorflow_enterprise.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Text-to-Speech",
+    "fileName": "text-to-speech.svg",
+    "relativePath": "services/text-to-speech/text-to-speech.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Tools for PowerShell",
+    "fileName": "tools_for_powershell.svg",
+    "relativePath": "services/tools_for_powershell/tools_for_powershell.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Trace",
+    "fileName": "trace.svg",
+    "relativePath": "services/trace/trace.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Traffic Director",
+    "fileName": "traffic_director.svg",
+    "relativePath": "services/traffic_director/traffic_director.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Transfer",
+    "fileName": "transfer.svg",
+    "relativePath": "services/transfer/transfer.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Transfer Appliance",
+    "fileName": "transfer_appliance.svg",
+    "relativePath": "services/transfer_appliance/transfer_appliance.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "User Preferences",
+    "fileName": "user_preferences.svg",
+    "relativePath": "services/user_preferences/user_preferences.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Vertex AI",
+    "fileName": "vertexai.svg",
+    "relativePath": "services/vertexai/vertexai.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Video Intelligence API",
+    "fileName": "video_intelligence_api.svg",
+    "relativePath": "services/video_intelligence_api/video_intelligence_api.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Virtual Private Cloud",
+    "fileName": "virtual_private_cloud.svg",
+    "relativePath": "services/virtual_private_cloud/virtual_private_cloud.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Visual Inspection",
+    "fileName": "visual_inspection.svg",
+    "relativePath": "services/visual_inspection/visual_inspection.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "VMware Engine",
+    "fileName": "vmware_engine.svg",
+    "relativePath": "services/vmware_engine/vmware_engine.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Web Risk",
+    "fileName": "web_risk.svg",
+    "relativePath": "services/web_risk/web_risk.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Web Security Scanner",
+    "fileName": "web_security_scanner.svg",
+    "relativePath": "services/web_security_scanner/web_security_scanner.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Workflows",
+    "fileName": "workflows.svg",
+    "relativePath": "services/workflows/workflows.svg"
+  },
+  {
+    "cloud": "GCP",
+    "category": "Services",
+    "subcategory": null,
+    "name": "Workload Identity Pool",
+    "fileName": "workload_identity_pool.svg",
+    "relativePath": "services/workload_identity_pool/workload_identity_pool.svg"
+  }
+]

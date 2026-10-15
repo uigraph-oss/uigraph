@@ -1,0 +1,257 @@
+.react-flow__pane.selection {
+  cursor: default !important;
+}
+
+.react-flow__node {
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: 0 24px 40px 0 transparent !important;
+  transition:
+    opacity 0.1s ease-in-out,
+    box-shadow 0.2s ease-in-out,
+    outline-color 0.2s ease-in-out !important;
+
+  &,
+  .react-flow__handle {
+    border: none !important;
+  }
+
+  &.react-flow__node-default {
+    width: revert !important;
+  }
+
+  &.react-flow__node-shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.react-flow__node-group,
+  &.react-flow__node-c4Boundary {
+    z-index: -1 !important;
+  }
+
+  &.react-flow__node-comment {
+    z-index: 10000 !important;
+    isolation: isolate !important;
+    pointer-events: none !important;
+  }
+
+  &::before {
+    content: '';
+    inset: 0;
+    z-index: -2;
+    position: absolute;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    filter: blur(1rem);
+    background: linear-gradient(
+      123deg,
+      rgb(0, 108, 224) 0%,
+      rgb(41, 94, 255) 50%,
+      rgb(104, 66, 255) 100%
+    );
+  }
+
+  &:hover &::before {
+    opacity: 0.75;
+  }
+
+  .react-flow__handle {
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 0 !important;
+    max-height: 0 !important;
+    border: none !important;
+
+    $handle-margin: -10px;
+    --scale: calc(2 * var(--react-flow-counter-scale));
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      z-index: 100;
+
+      inset: 0;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+
+      opacity: 0 !important;
+      background-color: white !important;
+      outline: 1px solid oklch(70.708% 0.02244 261.79 / 0.33) !important;
+
+      transition:
+        opacity 0.1s ease-in-out,
+        transform 0.1s ease-in-out,
+        box-shadow 0.2s ease-in-out,
+        outline-color 0.2s ease-in-out !important;
+    }
+
+    &:hover:not(.connection-enabled),
+    &.connectingto:not(.connectingfrom) {
+      --scale: calc(4 * var(--react-flow-counter-scale));
+    }
+
+    &-top::after {
+      margin-top: $handle-margin;
+      transform: translateX(-50%) scale(var(--scale));
+    }
+
+    &-bottom::after {
+      margin-top: -$handle-margin;
+      transform: translate(-50%, -100%) scale(var(--scale));
+    }
+
+    &-left::after {
+      margin-left: $handle-margin;
+      transform: translateY(-50%) scale(var(--scale));
+    }
+
+    &-right::after {
+      margin-left: -$handle-margin;
+      transform: translate(-100%, -50%) scale(var(--scale));
+    }
+  }
+
+  &.selected .react-flow__handle::after,
+  &:hover .react-flow__handle.connection-enabled::after,
+  .react-flow__handle.connectingto::after,
+  .react-flow__handle.connectingfrom::after {
+    opacity: 1 !important;
+  }
+
+  .react-flow__handle.connectingto::after {
+    outline-color: #0059ea !important;
+    background-color: #0059ea !important;
+  }
+
+  &.selected .react-flow__handle::after {
+    outline-color: #0059ea !important;
+  }
+}
+
+// Make resize handles larger and more visible
+.react-flow__resize-control {
+  --scale: calc(1.5 * var(--react-flow-counter-scale));
+  transition: transform 0.1s ease-in-out;
+
+  &.handle {
+    scale: 1 !important;
+    transform: scale(var(--scale)) !important;
+  }
+
+  &.handle:hover,
+  &.handle:active {
+    transform: scale(calc(var(--scale) * 2)) !important;
+  }
+
+  &.line.left,
+  &.line.right,
+  &.line.top,
+  &.line.bottom {
+    border-width: 1.25px !important;
+  }
+
+  &.line.top,
+  &.line.bottom {
+    transform: translate(0, -50%) scaleY(var(--scale)) !important;
+  }
+
+  &.line.left,
+  &.line.right {
+    transform: translate(-50%) scaleX(var(--scale)) !important;
+  }
+}
+
+.react-flow__viewport.downloading .react-flow__node {
+  &,
+  * {
+    transition: none !important;
+  }
+
+  &::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  &.selected {
+    box-shadow: none !important;
+  }
+}
+
+.react-flow__edge {
+  transition: opacity 0.15s ease-in-out;
+}
+
+.react-flow__edge-endpoint {
+  fill: white;
+  stroke: #0059ea;
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.react-flow.space-panning {
+  .react-flow__node,
+  .react-flow__node *,
+  .react-flow__edge,
+  .react-flow__edge * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+}
+
+.react-flow.lod-active .react-flow__viewport:not(.downloading) {
+  .react-flow__node.lod-hidden,
+  .react-flow__edge.lod-hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition:
+      opacity 0.15s ease-in-out,
+      visibility 0s linear 0.15s !important;
+  }
+
+  .react-flow__edgelabel-renderer > *:not(.lod-boundary-label) {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.15s ease-in-out,
+      visibility 0s linear 0.15s;
+  }
+
+  .react-flow__node.lod-collapsed {
+    .c4-boundary-box {
+      border-style: solid !important;
+    }
+
+    .c4-boundary-label {
+      display: none;
+    }
+
+    .c4-boundary-collapsed-label {
+      display: flex;
+      font-size: var(--lod-font-size);
+    }
+  }
+}
+
+.react-flow__edge-path {
+  transition: filter 0.25s ease-in-out !important;
+  filter: saturate(1) drop-shadow(0 0 2px transparent) !important;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  filter: saturate(100) drop-shadow(0 0 2px gray) !important;
+}
+
+svg:has(.react-flow__edge:hover),
+svg:has(.react-flow__edge.selected) {
+  z-index: 10 !important;
+}
