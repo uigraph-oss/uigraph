@@ -41,7 +41,7 @@ Useful scripts:
 | `pnpm typecheck` | Type-checks the CLI and the viewer |
 | `pnpm lint` | Runs ESLint (`pnpm lint:fix` applies fixes) |
 
-To try your changes on a real project, run `node /path/to/uigraph/dist/bin.mjs` from inside that project. Use `--port` if 7357 is taken and `--debug` for stack traces.
+To try your changes on a real project, run `node /path/to/uigraph/dist/bin.mjs` from inside that project. Use `--port` if 8447 is taken and `--debug` for stack traces.
 
 ## Making a change
 

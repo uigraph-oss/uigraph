@@ -76,7 +76,7 @@ cd your-project
 uigraph
 ```
 
-UIGraph starts the viewer at `http://127.0.0.1:7357/` and opens the browser. The viewer keeps running in the background after the command finishes. Run `uigraph stop` to stop it.
+UIGraph starts the viewer at `http://127.0.0.1:8447/` and opens the browser. The viewer keeps running in the background after the command finishes. Run `uigraph stop` to stop it.
 
 Moving to another project? Run `uigraph` there too. If the viewer is already running, UIGraph adds the project to it instead of starting a second viewer.
 
@@ -113,7 +113,7 @@ Starts the viewer, adds the project's artifacts to it, and opens the browser. If
 
 | Option            | Effect                                         |
 | ----------------- | ---------------------------------------------- |
-| `--port <number>` | Viewer port. Default `7357`, or `UIGRAPH_PORT` |
+| `--port <number>` | Viewer port. Default `8447`, or `UIGRAPH_PORT` |
 | `--no-open`       | Do not open a browser                          |
 
 ### `uigraph sync`
