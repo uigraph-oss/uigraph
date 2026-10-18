@@ -1,4 +1,3 @@
-import { SectionNotFound } from '@/components/section-not-found'
 import { lazy } from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
@@ -25,11 +24,6 @@ const NotFoundPage = lazy(() =>
 const ServiceDependenciesRoute = lazy(() =>
   import('@/routes/service-pages').then((mod) => ({
     default: mod.ServiceDependenciesRoute,
-  }))
-)
-const DashboardSettingsLayout = lazy(() =>
-  import('@/features/dashboard').then((mod) => ({
-    default: mod.DashboardSettingsLayout,
   }))
 )
 const DashboardDiagramsPage = lazy(() =>
@@ -171,17 +165,6 @@ export function AppRoutes() {
           <Route index element={<DashboardLensRunsPage />} />
           <Route path=":runId" element={<LensRunPage inDashboard />} />
         </Route>
-        <Route
-          path="/settings"
-          element={
-            <DashboardSettingsLayout>
-              <SectionNotFound
-                plain
-                label="Settings are not available in uigraph."
-              />
-            </DashboardSettingsLayout>
-          }
-        />
         <Route path="/plans" element={<DashboardPlansPage />} />
         <Route path="/services" element={<DashboardServices />} />
         <Route
