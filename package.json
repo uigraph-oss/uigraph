@@ -45,7 +45,7 @@
     "@commander-js/extra-typings": "^15.0.0",
     "@inquirer/prompts": "^8.7.3",
     "@uigraph/lens": "^1.0.0",
-    "@uigraph/sdk": "^1.2.17",
+    "@uigraph/sdk": "^1.2.19",
     "commander": "^15.0.0",
     "consola": "^3.4.2",
     "graphql": "^16.14.2",
