@@ -88,7 +88,7 @@ const SUPPORTED_MUTATIONS = [
   'updateFocalPointMeta',
   'deleteFocalPointMeta',
 ]
-export const DEFAULT_PORT = 7357
+export const DEFAULT_PORT = 8447
 const HEALTH_PATH = '/__uigraph'
 const INFO_PATH = '/__uigraph/info'
 const HEALTH_BODY = 'uigraph'
