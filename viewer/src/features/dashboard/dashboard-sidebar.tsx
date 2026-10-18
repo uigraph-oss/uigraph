@@ -11,7 +11,7 @@ import { DASHBOARD_NAV_LINKS } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth-store'
 import { ReactNode } from 'react'
-import { LuCloud } from 'react-icons/lu'
+import { LuSparkles } from 'react-icons/lu'
 import { Link, useLocation } from 'react-router-dom'
 
 export function DashboardSidebar() {
@@ -57,8 +57,8 @@ export function DashboardSidebar() {
         <ul className="shrink-0 px-2">
           <SidebarNavItem
             to="/plans"
-            label="Cloud"
-            icon={<LuCloud />}
+            label="Plans"
+            icon={<LuSparkles />}
             isActive={pathname.startsWith('/plans')}
           />
         </ul>
