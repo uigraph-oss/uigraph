@@ -1,0 +1,382 @@
+{
+  "nodes": {
+    "user": {
+      "type": "shape",
+      "name": "Developer",
+      "shape": "terminator",
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 0,
+        "y": 274.5
+      }
+    },
+    "cli": {
+      "type": "shape",
+      "name": "uigraph CLI (src/bin.ts)",
+      "shape": "rectangle",
+      "style": {
+        "width": 84,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 395,
+        "y": 56.5
+      }
+    },
+    "browser": {
+      "type": "shape",
+      "name": "Viewer SPA (viewer/)",
+      "shape": "rectangle",
+      "style": {
+        "width": 116,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 379,
+        "y": 409.5
+      }
+    },
+    "lock_file": {
+      "type": "shape",
+      "name": "Viewer lock file",
+      "shape": "document",
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 697.5,
+        "y": 0
+      }
+    },
+    "registry": {
+      "type": "shape",
+      "name": "~/.uigraph/registry.yaml",
+      "shape": "document",
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1418,
+        "y": 91
+      }
+    },
+    "viewer_server": {
+      "type": "shape",
+      "name": "Viewer server (src/server.ts), 127.0.0.1:8447",
+      "shape": "rectangle",
+      "style": {
+        "width": 164,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 695,
+        "y": 399.5
+      }
+    },
+    "workspace": {
+      "type": "shape",
+      "name": "Workspace loader (src/workspace.ts)",
+      "shape": "rectangle",
+      "style": {
+        "width": 132,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1072.5,
+        "y": 350
+      }
+    },
+    "project_files": {
+      "type": "shape",
+      "name": ".uigraph.yaml and .uigraph/",
+      "shape": "document",
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1418,
+        "y": 404.5
+      }
+    },
+    "lens_data": {
+      "type": "shape",
+      "name": "~/.uigraph/lens",
+      "shape": "document",
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1059,
+        "y": 185
+      }
+    },
+    "lens_engine": {
+      "type": "shape",
+      "name": "Lens runner (src/lens.ts)",
+      "shape": "rectangle",
+      "style": {
+        "width": 148,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1064.5,
+        "y": 684.75
+      }
+    },
+    "github": {
+      "type": "shape",
+      "name": "GitHub",
+      "shape": "rectangle",
+      "style": {
+        "width": 108,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1443.5,
+        "y": 592.5
+      }
+    },
+    "agents": {
+      "type": "shape",
+      "name": "Coding agents (Claude Code, Codex, OpenCode, Pi, Cursor)",
+      "shape": "rectangle",
+      "style": {
+        "width": 108,
+        "height": 58
+      },
+      "___internal": {
+        "source": "mermaid"
+      },
+      "___position": {
+        "x": 1443.5,
+        "y": 770.5
+      }
+    }
+  },
+  "edges": {
+    "user-cli": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "cli-lock_file": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "start, status, stop",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "cli-registry": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "register project",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "cli-viewer_server": {
+      "type": "smoothstep",
+      "sourceHandle": "source-bottom",
+      "targetHandle": "target-top",
+      "label": "POST lens runs",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "user-browser": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "browser-viewer_server": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "GraphQL, REST",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "viewer_server-workspace": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "workspace-registry": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "workspace-project_files": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "viewer_server-project_files": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "save edits",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "viewer_server-lens_data": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "runs, settings",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "viewer_server-lens_engine": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "lens_engine-github": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "fetch PR",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    },
+    "lens_engine-agents": {
+      "type": "smoothstep",
+      "sourceHandle": "source-right",
+      "targetHandle": "target-left",
+      "label": "run review",
+      "style": {
+        "strokeWidth": 2.5
+      },
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "___internal": {
+        "source": "mermaid"
+      }
+    }
+  }
+}

@@ -3,10 +3,10 @@ import { useCurrentOrganization } from '@/store/auth-store'
 import { useQuery } from '@apollo/client'
 import { arrayNonNullable } from 'daily-code'
 import { createContext } from 'daily-code/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DIAGRAMS } from '../api/diagrams'
 
-const PAGE_SIZE = 24
+const ROWS_PER_PAGE = 3
 
 export const [DiagramsContextProvider, useDiagramsContext] = createContext(
   () => {
@@ -15,10 +15,22 @@ export const [DiagramsContextProvider, useDiagramsContext] = createContext(
     const [search, setSearch] = useState('')
     const debouncedSearch = useDebouncedValue(search)
     const [page, setPage] = useState(0)
+    const [columns, setColumnsState] = useState(4)
+    const pageSize = columns * ROWS_PER_PAGE
 
     useEffect(() => {
       setPage(0)
     }, [debouncedSearch])
+
+    // Keep the first visible diagram on screen when the column count changes.
+    const setColumns = useCallback(
+      (next: number) => {
+        if (next === columns) return
+        setPage((p) => Math.floor((p * columns) / next))
+        setColumnsState(next)
+      },
+      [columns]
+    )
 
     const diagramsQuery = useQuery(DIAGRAMS, {
       fetchPolicy: 'cache-and-network',
@@ -29,8 +41,8 @@ export const [DiagramsContextProvider, useDiagramsContext] = createContext(
         search: debouncedSearch || null,
         sortBy: 'name',
         sortDir: 'asc',
-        limit: PAGE_SIZE,
-        offset: page * PAGE_SIZE,
+        limit: pageSize,
+        offset: page * pageSize,
       },
     })
 
@@ -46,7 +58,8 @@ export const [DiagramsContextProvider, useDiagramsContext] = createContext(
     return {
       diagrams,
       totalCount,
-      pageSize: PAGE_SIZE,
+      pageSize,
+      setColumns,
       page,
       setPage,
       isLoading,

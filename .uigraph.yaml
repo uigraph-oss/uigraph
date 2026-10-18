@@ -1,0 +1,29 @@
+version: 1
+
+service:
+  name: UIGraph
+  category: CLI
+  description: CLI and local viewer that show a project's services, APIs, dependencies and diagrams, and run Lens pull request reviews.
+  repository:
+    provider: github
+    url: https://github.com/uigraph-oss/uigraph
+  ownership:
+    team: uigraph-oss
+
+architectureDiagrams:
+  - name: System Context
+    path: .uigraph/diagrams/system-context/system-context.mmd
+    contextPath: .uigraph/diagrams/system-context/context.json
+  - name: Lens Review Run
+    path: .uigraph/diagrams/lens-review-run/lens-review-run.mmd
+    contextPath: .uigraph/diagrams/lens-review-run/context.json
+
+docs:
+  - name: README
+    path: README.md
+    fileType: markdown
+    description: Install, quick start, commands and Lens
+  - name: Contributing Guide
+    path: CONTRIBUTING.md
+    fileType: markdown
+    description: Development setup and review expectations

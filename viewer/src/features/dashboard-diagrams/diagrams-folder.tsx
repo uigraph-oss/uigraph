@@ -6,15 +6,20 @@ import { SectionNotFound } from '@/components/section-not-found'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { useEffect, useRef } from 'react'
 import { DashboardDiagram } from './api/diagrams'
 import { useDiagramsContext } from './contexts/diagrams-context'
 import { FlowDiagramCard } from './flow-diagram-card'
+
+const CARD_MIN_WIDTH = 280
+const GRID_GAP = 16
 
 export function DiagramsFolder() {
   const {
     diagrams,
     totalCount,
     pageSize,
+    setColumns,
     page,
     setPage,
     isLoading,
@@ -22,8 +27,27 @@ export function DiagramsFolder() {
     setSearch,
   } = useDiagramsContext()
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Mirror the grid's auto-fill column count so a page is always 3 full rows.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width
+      setColumns(
+        Math.max(
+          1,
+          Math.floor((width + GRID_GAP) / (CARD_MIN_WIDTH + GRID_GAP))
+        )
+      )
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [setColumns])
+
   return (
-    <div className="space-y-6 pb-4">
+    <div ref={containerRef} className="space-y-6 pb-4">
       <div className="flex items-center gap-2">
         <Input
           value={search}
@@ -92,7 +116,9 @@ function DiagramGrid({
     <div className="space-y-4">
       <div
         className="grid gap-4 pb-4"
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}
+        style={{
+          gridTemplateColumns: `repeat(auto-fill, minmax(${CARD_MIN_WIDTH}px, 1fr))`,
+        }}
       >
         {diagrams.map((diagram) => (
           <FlowDiagramCard key={diagram.id} diagram={diagram} />

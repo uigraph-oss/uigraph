@@ -1,0 +1,27 @@
+flowchart LR
+user["Developer"]
+cli["uigraph CLI (src/bin.ts)"]
+browser["Viewer SPA (viewer/)"]
+lock_file["Viewer lock file"]
+registry["~/.uigraph/registry.yaml"]
+viewer_server
+workspace
+project_files[".uigraph.yaml and .uigraph/"]
+lens_data["~/.uigraph/lens"]
+lens_engine["Lens runner (src/lens.ts)"]
+github["GitHub"]
+agents
+user --> cli
+cli --> lock_file
+cli --> registry
+cli --> viewer_server
+user --> browser
+browser --> viewer_server
+viewer_server --> workspace
+workspace --> registry
+workspace --> project_files
+viewer_server --> project_files
+viewer_server --> lens_data
+viewer_server --> lens_engine
+lens_engine --> github
+lens_engine --> agents
