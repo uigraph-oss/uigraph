@@ -100,6 +100,22 @@ describe('uigraph CLI', () => {
     )
   })
 
+  it('shows why the background viewer did not start', async () => {
+    const blocker = net.createServer((socket) => socket.destroy())
+    await new Promise<void>((resolve) =>
+      blocker.listen(port, '127.0.0.1', resolve)
+    )
+    try {
+      const result = await uigraph('open', '--no-open', root)
+      expect(result.code).toBe(1)
+      expect(result.stderr).toContain(
+        `Port ${port} is in use by another program`
+      )
+    } finally {
+      await new Promise((resolve) => blocker.close(resolve))
+    }
+  })
+
   it('starts, reports and stops the viewer', async () => {
     expect(await uigraph('status')).toMatchObject({
       code: 1,

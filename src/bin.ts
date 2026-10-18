@@ -248,13 +248,31 @@ async function startViewer(
     await log.write(
       `\n--- ${new Date().toISOString()} uigraph ${VERSION} ---\n`
     )
-    spawn(
+    const logStart = (await log.stat()).size
+    const child = spawn(
       process.execPath,
       [...process.execArgv, process.argv[1]!, 'start', '--port', String(port)],
       { detached: true, stdio: ['ignore', log.fd, log.fd] }
-    ).unref()
+    )
+    let exited = false
+    child.once('exit', () => {
+      exited = true
+    })
+    child.unref()
     await log.close()
     for (let waited = 0; !(await isServerRunning(port)); waited += 100) {
+      if (exited) {
+        const output = (await fs.readFile(logFile, 'utf8'))
+          .slice(logStart)
+          .trim()
+        if (output === '') {
+          fail(
+            `The viewer exited before it started. See ${logFile}, or run "uigraph start" to see why.`
+          )
+        }
+        console.error(output)
+        process.exit(1)
+      }
       if (waited >= 10000) {
         fail(
           `The viewer did not start in the background. See ${logFile}, or run "uigraph start" to see why.`
