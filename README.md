@@ -31,7 +31,7 @@
   <img src="docs/media/uigraph-demo.gif" alt="Running uigraph shows the UIGraph banner and starts the local viewer" width="800" />
 </p>
 
-UIGraph brings your project's architecture artifacts into one local viewer. The UIGraph skill guides your coding agent through reading your project and creating artifacts that describe your system, including service maps, API specs, dependency graphs, and architecture diagrams. Together, these artifacts give you a clearer picture of how your system is structured and how its components relate to one another.
+UIGraph is an open-source local viewer for your project's engineering context. The UIGraph skill guides your coding agent through reading your project and creating artifacts that describe your system, including service maps, API specs, dependency graphs, and architecture diagrams. Together, these artifacts give you a clearer picture of how your system is structured and how its components relate to one another.
 
 Works with Claude Code, Codex, OpenCode, Pi, and Cursor.
 
