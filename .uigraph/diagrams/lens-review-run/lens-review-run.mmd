@@ -1,0 +1,15 @@
+flowchart TD
+  cmd[uigraph lens] --> resolve[Resolve PR or branches]
+  resolve --> start_viewer[Start viewer if needed]
+  start_viewer -->|POST api lens runs| handler[handleLensRequest]
+  handler --> start_run[startLensRun]
+  start_run --> source{Review source}
+  source -->|github| token[Resolve GitHub token]
+  token -->|fetchReview| github[GitHub]
+  source -->|local| local_git[readLocalReview via git]
+  github --> analyze[analyzeReview with agent]
+  local_git --> analyze
+  analyze -->|stage updates| subscribers[Run subscribers]
+  analyze -->|saved runs| lens_data[~/.uigraph/lens]
+  subscribers --> lens_page[Viewer Lens page]
+  start_run -->|runId| cmd

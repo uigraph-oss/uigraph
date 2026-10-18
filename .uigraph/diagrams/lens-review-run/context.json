@@ -1,0 +1,17 @@
+{
+  "nodes": {
+    "cmd": { "name": "uigraph lens" },
+    "resolve": { "name": "Resolve PR or branches" },
+    "start_viewer": { "name": "Start viewer if needed" },
+    "handler": { "name": "handleLensRequest (server.ts)" },
+    "start_run": { "name": "startLensRun (lens.ts)" },
+    "source": { "type": "shape", "shape": "diamond", "name": "Review source" },
+    "token": { "name": "Resolve GitHub token (GITHUB_TOKEN, GH_TOKEN, gh)" },
+    "github": { "name": "GitHub" },
+    "local_git": { "name": "readLocalReview via git" },
+    "analyze": { "name": "analyzeReview with chosen agent" },
+    "subscribers": { "name": "Run subscribers" },
+    "lens_data": { "type": "shape", "shape": "document", "name": "~/.uigraph/lens/runs" },
+    "lens_page": { "name": "Viewer Lens page" }
+  }
+}
