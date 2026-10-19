@@ -2,7 +2,7 @@
   <img src="docs/media/uigraph-mark.svg" alt="UIGraph" width="96" height="96" />
 </p>
 <h1 align="center">UIGraph</h1>
-<h3 align="center">Map your project into services, APIs and diagrams.</h3>
+<h3 align="center">Explore your software system’s engineering context.</h3>
 
 <p align="center">
   <a href="#install"><strong>Install</strong></a> &nbsp;·&nbsp;
