@@ -161,7 +161,12 @@ describe('GraphQL', () => {
       },
       diagrams: {
         items: [
-          { id: expect.stringMatching(/--checkout$/), name: 'Checkout flow' },
+          {
+            id: expect.stringMatching(
+              /--uigraph-diagrams-checkout-checkout-mmd$/
+            ),
+            name: 'Checkout flow',
+          },
         ],
       },
       apiEndpoints: [

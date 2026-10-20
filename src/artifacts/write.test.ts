@@ -71,7 +71,7 @@ describe('diagrams', () => {
     })
     expect(
       await createDiagram(root, '.uigraph.yaml', '.uigraph.yaml', 'Payments')
-    ).toBe('payments-2')
+    ).toBe('uigraph-diagrams-payments-2-payments-2-mmd')
     expect(await readRepoFile(root, '.uigraph.yaml'))
       .toContain(`  - name: Checkout flow # main flow
     path: .uigraph/diagrams/checkout/checkout.mmd
@@ -82,8 +82,8 @@ describe('diagrams', () => {
     const { db, errors } = await loadArtifacts(root)
     expect(errors).toEqual([])
     expect(db.diagrams.map((d) => d.entity.id)).toEqual([
-      'checkout',
-      'payments-2',
+      'uigraph-diagrams-checkout-checkout-mmd',
+      'uigraph-diagrams-payments-2-payments-2-mmd',
     ])
   })
 
@@ -99,9 +99,14 @@ describe('diagrams', () => {
   it('renames a diagram without touching the rest of the file', async () => {
     const root = await createRepo(ORDERS_FILES)
     const before = await readRepoFile(root, '.uigraph.yaml')
-    const saved = await saveDiagram(root, '.uigraph.yaml', 'checkout', {
-      name: '  Checkout v2 ',
-    })
+    const saved = await saveDiagram(
+      root,
+      '.uigraph.yaml',
+      'uigraph-diagrams-checkout-checkout-mmd',
+      {
+        name: '  Checkout v2 ',
+      }
+    )
     expect(saved.name).toBe('Checkout v2')
     expect(await readRepoFile(root, '.uigraph.yaml')).toBe(
       before.replace('name: Checkout flow # main', 'name: Checkout v2 # main')
@@ -112,12 +117,17 @@ describe('diagrams', () => {
     const root = await createRepo(ORDERS_FILES)
     const { db } = await loadArtifacts(root)
     const flow = db.diagrams[0].flow
-    await saveDiagram(root, '.uigraph.yaml', 'checkout', {
-      content: JSON.stringify({
-        nodes: flow.nodes.filter((node) => node.id !== 'Db'),
-        edges: flow.edges.filter((edge) => edge.target !== 'Db'),
-      }),
-    })
+    await saveDiagram(
+      root,
+      '.uigraph.yaml',
+      'uigraph-diagrams-checkout-checkout-mmd',
+      {
+        content: JSON.stringify({
+          nodes: flow.nodes.filter((node) => node.id !== 'Db'),
+          edges: flow.edges.filter((edge) => edge.target !== 'Db'),
+        }),
+      }
+    )
     const mermaid = await readRepoFile(
       root,
       '.uigraph/diagrams/checkout/checkout.mmd'
@@ -137,7 +147,11 @@ describe('diagrams', () => {
       ...ORDERS_FILES,
       '.uigraph/diagrams/checkout/images/shot.png': 'png',
     })
-    await deleteDiagram(root, '.uigraph.yaml', 'checkout')
+    await deleteDiagram(
+      root,
+      '.uigraph.yaml',
+      'uigraph-diagrams-checkout-checkout-mmd'
+    )
     expect(await readRepoFile(root, '.uigraph.yaml')).toContain(
       'architectureDiagrams: []\n'
     )

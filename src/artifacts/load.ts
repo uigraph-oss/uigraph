@@ -678,9 +678,11 @@ export async function loadArtifacts(root: string, configFile = ROOT_CONFIG) {
         : serviceIdByName.get(config.service.name)
     for (const [index, entry] of config.architectureDiagrams.entries()) {
       const where = `${file}: architectureDiagrams[${entry.name}]`
-      const id = slugify(path.posix.basename(path.posix.dirname(entry.path)))
+      const id = slugify(entry.path)
       if (diagramIds.has(id)) {
-        errors.push(`${where}: another diagram already uses the folder "${id}"`)
+        errors.push(
+          `${where}: another diagram already uses the path "${entry.path}"`
+        )
         continue
       }
       let mermaid: string
