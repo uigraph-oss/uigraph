@@ -1,6 +1,6 @@
 {
   "name": "uigraph",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Browse and edit UIGraph artifacts in a local viewer, and review pull requests with Lens.",
   "keywords": [
     "architecture",
