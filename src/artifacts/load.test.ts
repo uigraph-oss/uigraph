@@ -27,7 +27,9 @@ describe('loadArtifacts', () => {
       ['GET', '/orders', 'listOrders'],
       ['POST', '/orders', 'createOrder'],
     ])
-    expect(db.diagrams[0].entity.id).toBe('checkout')
+    expect(db.diagrams[0].entity.id).toBe(
+      'uigraph-diagrams-checkout-checkout-mmd'
+    )
     expect(db.diagrams[0].flow.nodes.length).toBeGreaterThan(0)
     expect(db.databases[0].serviceDb.tables).toEqual([
       expect.objectContaining({

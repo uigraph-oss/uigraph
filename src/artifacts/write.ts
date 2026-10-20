@@ -260,8 +260,7 @@ export async function createDiagram(
   let folder = base
   for (
     let suffix = 2;
-    db.diagrams.some((d) => d.entity.id === folder) ||
-    (await fs.lstat(path.join(root, '.uigraph/diagrams', folder)).then(
+    await fs.lstat(path.join(root, '.uigraph/diagrams', folder)).then(
       () => true,
       (error: NodeJS.ErrnoException) => {
         if (error.code === 'ENOENT') {
@@ -269,7 +268,7 @@ export async function createDiagram(
         }
         throw error
       }
-    ));
+    );
     suffix++
   ) {
     folder = `${base}-${suffix}`
@@ -296,7 +295,7 @@ export async function createDiagram(
       appendItem(source, document, ['architectureDiagrams'], entry),
     ])
   )
-  return folder
+  return slugify(entry.path)
 }
 
 export async function deleteDiagram(
