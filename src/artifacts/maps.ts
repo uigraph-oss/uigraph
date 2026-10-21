@@ -10,11 +10,7 @@ import {
   type CanvasFile,
   type MapEntry,
 } from './load.js'
-import {
-  deleteArtifactFile,
-  isArtifactPath,
-  writeArtifactFile,
-} from './write.js'
+import { deleteArtifactFile, writeArtifactFile } from './write.js'
 import {
   appendItem,
   applyEdits,
@@ -168,7 +164,7 @@ export async function deleteUnusedImages(
     )
   )
   for (const imagePath of imagePaths) {
-    if (isArtifactPath(imagePath) && !used.has(imagePath)) {
+    if (!used.has(imagePath)) {
       await deleteArtifactFile(root, imagePath)
     }
   }

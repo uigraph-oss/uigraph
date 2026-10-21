@@ -4,7 +4,6 @@ import { C4BoundaryNode } from './c4-boundary-node'
 import { C4Node } from './c4-node'
 import { CloudNode } from './cloud-node'
 import { CodeNode } from './code-node'
-import { CommentNode } from './comment-node'
 import { DataTableInterfaceNode } from './data-table-node'
 import { DatabaseTableSQLNode } from './database-table-node-sql'
 import { GroupNode } from './group-node'
@@ -24,7 +23,6 @@ export type * from './c4-boundary-node'
 export type * from './c4-node'
 export type * from './cloud-node'
 export type * from './code-node'
-export type * from './comment-node'
 export type * from './database-table-node-sql'
 export type * from './group-node'
 export type * from './image-node'
@@ -39,7 +37,6 @@ export type TNodeTypes = keyof typeof CUSTOM_NODE_TYPES
 export const CUSTOM_NODE_TYPES = {
   default: ShapeNode,
   builder: BuilderNode,
-  comment: CommentNode,
   gif: AnimatedNode,
   group: GroupNode,
   shape: ShapeNode,

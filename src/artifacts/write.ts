@@ -11,7 +11,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { isMap, isScalar, stringify, visit, type Node as YamlNode } from 'yaml'
 import { listDiagramImages } from './diagram-images.js'
-import { contentHash, loadArtifacts, ROOT_CONFIG, slugify } from './load.js'
+import { contentHash, loadArtifacts, slugify } from './load.js'
 import {
   appendItem,
   applyEdits,
@@ -24,11 +24,7 @@ import {
 const MAX_WRITE_BYTES = 2_000_000
 export const MAX_UPLOAD_BYTES = 50_000_000
 
-export function isArtifactPath(relativePath: string) {
-  return relativePath === ROOT_CONFIG || relativePath.startsWith('.uigraph/')
-}
-
-function toArtifactPath(requested: string) {
+function toRepoPath(requested: string) {
   const relativePath = path.posix
     .normalize(requested.replaceAll('\\', '/'))
     .replace(/^\.\//, '')
@@ -38,16 +34,19 @@ function toArtifactPath(requested: string) {
   ) {
     throw new Error(`Path must be relative to the repository: ${requested}`)
   }
-  if (!isArtifactPath(relativePath) || relativePath.endsWith('/')) {
-    throw new Error(
-      `Only ${ROOT_CONFIG} and files under .uigraph/ can be written: ${requested}`
-    )
+  if (
+    relativePath === '' ||
+    relativePath === '.' ||
+    relativePath.endsWith('/') ||
+    relativePath.split('/')[0] === '.git'
+  ) {
+    throw new Error(`Not a writable file path: ${requested}`)
   }
   return relativePath
 }
 
 export async function deleteArtifactFile(root: string, requested: string) {
-  const relativePath = toArtifactPath(requested)
+  const relativePath = toRepoPath(requested)
   let current = root
   for (const segment of relativePath.split('/')) {
     current = path.join(current, segment)
@@ -59,10 +58,9 @@ export async function deleteArtifactFile(root: string, requested: string) {
     }
   }
   await fs.rm(current)
-  const artifactRoot = path.join(root, '.uigraph')
   for (
     let directory = path.dirname(current);
-    directory.startsWith(`${artifactRoot}${path.sep}`);
+    directory !== root && directory !== path.join(root, '.uigraph');
     directory = path.dirname(directory)
   ) {
     if ((await fs.readdir(directory)).length > 0) {
@@ -77,7 +75,7 @@ export async function writeArtifactFile(
   requested: string,
   content: string | Buffer
 ) {
-  const relativePath = toArtifactPath(requested)
+  const relativePath = toRepoPath(requested)
   const limit = typeof content === 'string' ? MAX_WRITE_BYTES : MAX_UPLOAD_BYTES
   if (Buffer.byteLength(content) > limit) {
     throw new Error(`Content is larger than ${limit} bytes`)
@@ -311,7 +309,15 @@ export async function deleteDiagram(
   if (diagram === undefined) {
     throw new Error(`Diagram ${diagramId} not found`)
   }
-  const images = await listDiagramImages(root, diagram.entry.path)
+  const sharesFolder = db.diagrams.some(
+    (d) =>
+      d !== diagram &&
+      path.posix.dirname(d.entry.path) ===
+        path.posix.dirname(diagram.entry.path)
+  )
+  const images = sharesFolder
+    ? []
+    : await listDiagramImages(root, diagram.entry.path)
   const { source, document } = await readYaml(root, diagram.file)
   await writeArtifactFile(
     root,
@@ -325,7 +331,7 @@ export async function deleteDiagram(
     diagram.entry.contextPath,
     ...images.map((image) => image.imagePath),
   ]) {
-    if (file !== undefined && isArtifactPath(file)) {
+    if (file !== undefined) {
       await deleteArtifactFile(root, file)
     }
   }

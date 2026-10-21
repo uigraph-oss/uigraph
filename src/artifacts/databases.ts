@@ -1,11 +1,7 @@
 import path from 'node:path'
 import { exists, loadValid } from './docs.js'
 import { DATABASE_DIALECTS, parseDatabaseSchema, slugify } from './load.js'
-import {
-  deleteArtifactFile,
-  isArtifactPath,
-  writeArtifactFile,
-} from './write.js'
+import { deleteArtifactFile, writeArtifactFile } from './write.js'
 import {
   appendItem,
   applyEdits,
@@ -103,7 +99,7 @@ export async function deleteDatabase(
   const stillUsed = db.databases.some(
     (d) => d !== database && d.entry.schemaPath === database.entry.schemaPath
   )
-  if (isArtifactPath(database.entry.schemaPath) && !stillUsed) {
+  if (!stillUsed) {
     await deleteArtifactFile(root, database.entry.schemaPath)
   }
 }

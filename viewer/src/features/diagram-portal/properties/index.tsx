@@ -124,7 +124,7 @@ export function FloatingProperties() {
   return (
     <>
       <AnimatePresence>
-        {node && node.type !== 'comment' ? (
+        {node ? (
           <motion.div
             initial={{ opacity: 0, x: 16, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}

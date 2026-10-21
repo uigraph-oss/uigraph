@@ -6,13 +6,11 @@ import {
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { BsDatabase } from 'react-icons/bs'
-import { GoComment } from 'react-icons/go'
 import { LuCloudy, LuImage, LuShapes, LuWorkflow } from 'react-icons/lu'
 import { MdAnimation } from 'react-icons/md'
 import { RxText } from 'react-icons/rx'
 import { useFlowDiagramContext } from '../context/flow-diagram-context'
 import { SidebarAnimatedNodes } from './panel-animated-nodes'
-import { SidebarComments } from './panel-comments'
 import { PanelDataSourcesUnified } from './panel-data-sources-unified'
 import { SidebarIcons } from './panel-icons'
 import { SidebarImages } from './panel-images'
@@ -99,22 +97,6 @@ export function FloatingLeftSidebar() {
           />
 
           <SidebarButton
-            name="Comments"
-            icon={<GoComment />}
-            isActive={
-              sidebarActiveTool === 'comments' ||
-              sidebarActiveTool === 'add-comment'
-            }
-            onClick={() =>
-              setSidebarActiveTool((prev) =>
-                prev === 'comments' || prev === 'add-comment'
-                  ? null
-                  : 'comments'
-              )
-            }
-          />
-
-          <SidebarButton
             name="Data Sources"
             icon={<BsDatabase />}
             isActive={sidebarActiveTool === 'data-sources'}
@@ -134,8 +116,6 @@ export function FloatingLeftSidebar() {
       {sidebarActiveTool === 'animated' && <SidebarAnimatedNodes />}
       {sidebarActiveTool === 'text' && <SidebarText />}
       {sidebarActiveTool === 'data-sources' && <PanelDataSourcesUnified />}
-      {(sidebarActiveTool === 'comments' ||
-        sidebarActiveTool === 'add-comment') && <SidebarComments />}
     </>
   )
 }

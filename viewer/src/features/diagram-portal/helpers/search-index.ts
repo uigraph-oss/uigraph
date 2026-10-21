@@ -179,7 +179,7 @@ function buildEntry(node: Node): Omit<DiagramSearchEntry, 'parentPath'> | null {
     }
   }
 
-  if (node.type === 'image' || node.type === 'gif' || node.type === 'comment') {
+  if (node.type === 'image' || node.type === 'gif') {
     return null
   }
 

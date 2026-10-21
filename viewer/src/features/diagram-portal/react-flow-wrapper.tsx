@@ -1,6 +1,5 @@
 'use client'
 
-import { VirtualCursor } from '@/components/virtual-cursor'
 import { env } from '@/env'
 import { ComponentInputType } from '@/features/component-meta'
 import { useAutoRef } from '@/hooks/use-auto-ref'
@@ -88,7 +87,6 @@ export function ReactFlowWrapper({
     reactFlowInstance,
     setReactFlowInstance,
 
-    sidebarActiveTool,
     setSidebarActiveTool,
 
     cursorMode,
@@ -350,39 +348,6 @@ export function ReactFlowWrapper({
     [ref, reactFlowInstance, isPreviewing, setNodes, setEdges]
   )
 
-  const onPaneClick = useCallback(
-    (event: React.MouseEvent) => {
-      if (!reactFlowInstance) return
-      if (isPreviewing) return
-      if (sidebarActiveTool !== 'add-comment') return
-
-      const id = generateUUID()
-      const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      })
-
-      setNodes((nds: Node[]) => [
-        ...nds,
-        {
-          id,
-          type: 'comment',
-          data: { message: '' },
-          position,
-        } as Node,
-      ])
-
-      setSidebarActiveTool(null)
-    },
-    [
-      reactFlowInstance,
-      isPreviewing,
-      sidebarActiveTool,
-      setNodes,
-      setSidebarActiveTool,
-    ]
-  )
-
   const onDrawComplete = useCallback(
     (bounds: { x: number; y: number; width: number; height: number }) => {
       if (!reactFlowInstance) return
@@ -398,7 +363,7 @@ export function ReactFlowWrapper({
       }
 
       const nodesInBounds = nodes.filter((node: Node) => {
-        if (isFrameNode(node) || node.type === 'comment' || node.parentId) {
+        if (isFrameNode(node) || node.parentId) {
           return false
         }
 
@@ -514,9 +479,7 @@ export function ReactFlowWrapper({
 
       const isCtrlOrCmd = event.ctrlKey || event.metaKey
       const isEditingNodeLabel =
-        isTyping &&
-        target.closest('.react-flow__node') !== null &&
-        target.closest('.react-flow__node-comment') === null
+        isTyping && target.closest('.react-flow__node') !== null
       const canUndoRedo = !isTyping || isEditingNodeLabel
 
       if (isCtrlOrCmd && !event.shiftKey && event.key === 'z' && canUndoRedo) {
@@ -582,8 +545,6 @@ export function ReactFlowWrapper({
 
   return (
     <>
-      {sidebarActiveTool === 'add-comment' && <VirtualCursor />}
-
       {isPreviewing && (
         <style>{`
           .diagram-preview-locked .react-flow__node,
@@ -612,7 +573,6 @@ export function ReactFlowWrapper({
         onConnectEnd={onConnectEnd}
         onConnectStart={onConnectStart}
         onDragOver={onDragOver}
-        onPaneClick={onPaneClick}
         onReconnect={onReconnect}
         onReconnectStart={onReconnectStart}
         onReconnectEnd={onReconnectEnd}
@@ -628,9 +588,6 @@ export function ReactFlowWrapper({
           reactFlowInstance && 'opacity-100',
           lodDepth !== Infinity && 'lod-active',
           spacePanning && 'space-panning',
-          sidebarActiveTool === 'add-comment' &&
-            'cursor-none! [&_*]:cursor-none!',
-
           isPreviewing && 'diagram-preview-locked'
         )}
         onNodesChange={onNodesChange}
@@ -667,7 +624,7 @@ export function ReactFlowWrapper({
           setReactFlowInstance(rf)
         }}
         onPointerDown={() => {
-          setSidebarActiveTool((prev) => (prev === 'add-comment' ? prev : null))
+          setSidebarActiveTool(null)
         }}
         nodesDraggable={isNodeWritable && !spacePanning}
         nodesConnectable={isNodeWritable && !spacePanning}

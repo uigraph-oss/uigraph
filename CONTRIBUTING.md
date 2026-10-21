@@ -26,7 +26,7 @@ UIGraph currently links a sibling `uigraph-lens` package (`link:../uigraph-lens`
 
 ```sh
 cd uigraph-lens && pnpm install && pnpm build
-cd ../uigraph && pnpm install && pnpm build
+cd ../uigraph && pnpm install && NODE_OPTIONS=--max-old-space-size=8192 pnpm build
 node dist/bin.mjs
 ```
 
