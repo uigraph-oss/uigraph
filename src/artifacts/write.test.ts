@@ -24,17 +24,21 @@ describe('writeArtifactFile', () => {
   it.each([
     ['../outside.txt', 'Path must be relative to the repository'],
     ['/etc/passwd', 'Path must be relative to the repository'],
-    [
-      '.uigraph/../src/index.ts',
-      'Only .uigraph.yaml and files under .uigraph/',
-    ],
-    ['src/index.ts', 'Only .uigraph.yaml and files under .uigraph/'],
-    ['.uigraph/', 'Only .uigraph.yaml and files under .uigraph/'],
+    ['.uigraph/', 'Not a writable file path'],
+    ['.git/config', 'Not a writable file path'],
   ])('refuses %s', async (requested, message) => {
     const root = await createRepo({})
     await expect(writeArtifactFile(root, requested, 'x')).rejects.toThrow(
       message
     )
+  })
+
+  it('writes files outside .uigraph', async () => {
+    const root = await createRepo({})
+    expect(await writeArtifactFile(root, './diagram/a.mmd', 'hi')).toBe(
+      'diagram/a.mmd'
+    )
+    expect(await readRepoFile(root, 'diagram/a.mmd')).toBe('hi')
   })
 
   it('refuses to write through a symbolic link', async () => {
@@ -60,6 +64,15 @@ describe('deleteArtifactFile', () => {
     const root = await createRepo({ '.uigraph/a/b/c.txt': 'x' })
     await deleteArtifactFile(root, '.uigraph/a/b/c.txt')
     await expect(fs.readdir(path.join(root, '.uigraph'))).resolves.toEqual([])
+  })
+})
+
+describe('deleteArtifactFile outside .uigraph', () => {
+  it('removes the file and its empty folders', async () => {
+    const root = await createRepo({ 'diagram/a/b.mmd': 'x', 'keep.txt': 'y' })
+    await deleteArtifactFile(root, 'diagram/a/b.mmd')
+    await expect(fs.readdir(root)).resolves.not.toContain('diagram')
+    expect(await readRepoFile(root, 'keep.txt')).toBe('y')
   })
 })
 
@@ -158,6 +171,27 @@ describe('diagrams', () => {
     await expect(
       fs.readdir(path.join(root, '.uigraph/diagrams'))
     ).rejects.toThrow('ENOENT')
+  })
+
+  it("keeps a shared folder's images when deleting one diagram", async () => {
+    const root = await createRepo({
+      '.uigraph.yaml': `version: 1
+architectureDiagrams:
+  - name: A
+    path: diagram/a.mmd
+  - name: B
+    path: diagram/b.mmd
+`,
+      'diagram/a.mmd': 'flowchart LR\n  X --> Y\n',
+      'diagram/b.mmd': 'flowchart LR\n  X --> Y\n',
+      'diagram/images/shot.png': 'png',
+    })
+    await deleteDiagram(root, '.uigraph.yaml', 'diagram-a-mmd')
+    await expect(
+      fs.readFile(path.join(root, 'diagram/a.mmd'))
+    ).rejects.toThrow()
+    expect(await readRepoFile(root, 'diagram/images/shot.png')).toBe('png')
+    expect(await readRepoFile(root, 'diagram/b.mmd')).toContain('X')
   })
 
   it('renames references to a diagram in maps', async () => {

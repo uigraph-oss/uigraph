@@ -1,10 +1,6 @@
 import { loadValid } from './docs.js'
 import { slugify } from './load.js'
-import {
-  deleteArtifactFile,
-  isArtifactPath,
-  writeArtifactFile,
-} from './write.js'
+import { deleteArtifactFile, writeArtifactFile } from './write.js'
 import {
   appendItem,
   applyEdits,
@@ -100,11 +96,6 @@ export async function updateQuery(
   )
   const { description, tags, queryText, path, ...rest } = query.entry
   if (path !== undefined) {
-    if (!isArtifactPath(path)) {
-      throw new Error(
-        `The query file ${path} is outside .uigraph and cannot be edited`
-      )
-    }
     await writeArtifactFile(root, path, input.queryText)
   }
   const { source, document } = await readYaml(root, query.file)
@@ -141,7 +132,7 @@ export async function deleteQuery(
   )
   const path = query.entry.path
   const stillUsed = db.queries.some((q) => q !== query && q.entry.path === path)
-  if (path !== undefined && isArtifactPath(path) && !stillUsed) {
+  if (path !== undefined && !stillUsed) {
     await deleteArtifactFile(root, path)
   }
 }

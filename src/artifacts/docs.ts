@@ -1,11 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { loadArtifacts, slugify } from './load.js'
-import {
-  deleteArtifactFile,
-  isArtifactPath,
-  writeArtifactFile,
-} from './write.js'
+import { deleteArtifactFile, writeArtifactFile } from './write.js'
 import {
   appendItem,
   applyEdits,
@@ -107,7 +103,7 @@ export async function deleteDoc(
   const stillUsed = allDocs.some(
     (d) => d !== doc && d.entry.path === doc.entry.path
   )
-  if (isArtifactPath(doc.entry.path) && !stillUsed) {
+  if (!stillUsed) {
     await deleteArtifactFile(root, doc.entry.path)
   }
 }

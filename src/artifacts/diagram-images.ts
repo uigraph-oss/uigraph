@@ -11,7 +11,7 @@ const DIAGRAM_IMAGE_EXTENSIONS: Record<string, string> = {
 }
 
 function imageDirectory(diagramPath: string) {
-  return `${path.posix.dirname(diagramPath)}/images`
+  return path.posix.join(path.posix.dirname(diagramPath), 'images')
 }
 
 export async function listDiagramImages(root: string, diagramPath: string) {
