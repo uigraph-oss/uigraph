@@ -36,7 +36,7 @@ export function NodeShapeStyle() {
 
   const [localStrokeOpacity, setLocalStrokeOpacity] = useEffectState<
     number | null
-  >(data?.strokeOpacity || null)
+  >(data?.strokeOpacity ?? 1)
 
   const [localTextColor, setLocalTextColor] = useEffectState(
     data?.textColor || ''
@@ -65,6 +65,7 @@ export function NodeShapeStyle() {
       <Field label="Text Color">
         <ColorPickerInput
           value={localTextColor}
+          defaultColor="#f4f7fc"
           className="border-stock border-1 border-solid"
           onChange={(value) => {
             setLocalTextColor(value)
@@ -97,6 +98,7 @@ export function NodeShapeStyle() {
       <Field label="Background Color">
         <ColorPickerInput
           value={localColor == 'transparent' ? '' : localColor}
+          defaultColor="#f4f7fc"
           className="border-stock border-1 border-solid"
           onChange={(value) => {
             setLocalColor(value)
@@ -145,9 +147,9 @@ export function NodeShapeStyle() {
 
       <BorderPropertiesCustomizeSection
         data={{
-          borderColor: data?.stroke ?? null,
+          borderColor: data?.stroke ?? '#f4f7fc',
           borderStyle: data?.strokeStyle ?? null,
-          borderWidth: data?.strokeWidth ?? null,
+          borderWidth: data?.strokeWidth ?? 4,
           borderRadius: data?.cornerRadius ?? null,
           borderAnimationEnabled:
             data?.strokeAnimation === 'dash' ? true : false,
@@ -165,7 +167,7 @@ export function NodeShapeStyle() {
         }}
       />
 
-      <Field label="Border Transparency">
+      <Field label="Border Opacity">
         <SliderInput
           min={0}
           max={1}

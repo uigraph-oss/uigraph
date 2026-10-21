@@ -174,11 +174,13 @@ export function ColorPickerInput({
   onChange,
   className,
   readonly,
+  defaultColor,
 }: {
   value: string
   onChange: (value: string) => void
   className?: string
   readonly?: boolean
+  defaultColor?: string
 }) {
   const classes = useComponentMetaClasses()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -189,7 +191,7 @@ export function ColorPickerInput({
         <PopoverTrigger asChild>
           <div
             className="border-stock absolute top-1/2 left-3 size-6 -translate-y-1/2 rounded-md border"
-            style={{ backgroundColor: value }}
+            style={{ backgroundColor: value || defaultColor }}
           />
         </PopoverTrigger>
 
