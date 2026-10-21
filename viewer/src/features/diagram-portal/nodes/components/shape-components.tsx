@@ -32,7 +32,7 @@ function getStrokeAnimationStyle(
 
 export function RectangleShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -72,7 +72,7 @@ export function RectangleShape({
 
 export function RoundedRectShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -112,7 +112,7 @@ export function RoundedRectShape({
 
 export function EllipseShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -154,7 +154,7 @@ export function EllipseShape({
 
 export function DiamondShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -192,7 +192,7 @@ export function DiamondShape({
 
 export function TriangleShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -229,7 +229,7 @@ export function TriangleShape({
 
 export function ParallelogramShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -265,7 +265,7 @@ export function ParallelogramShape({
 
 export function TrapezoidShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -301,7 +301,7 @@ export function TrapezoidShape({
 
 export function HexagonShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -337,7 +337,7 @@ export function HexagonShape({
 
 export function DocumentShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -377,7 +377,7 @@ export function DocumentShape({
 
 export function CylinderShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -445,7 +445,7 @@ export function CylinderShape({
 
 export function DelayShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -479,7 +479,7 @@ export function DelayShape({
 
 export function OffPageConnectorShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -514,7 +514,7 @@ export function OffPageConnectorShape({
 
 export function TerminatorShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -553,7 +553,7 @@ export function TerminatorShape({
 
 export function MultipleDocumentsShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -618,7 +618,7 @@ export function MultipleDocumentsShape({
 
 export function SubroutineShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -672,7 +672,7 @@ export function SubroutineShape({
 
 export function ManualInputShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -711,7 +711,7 @@ export function ManualInputShape({
 
 export function SummingJunctionShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -774,7 +774,7 @@ export function SummingJunctionShape({
 
 export function InternalStorageShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -835,7 +835,7 @@ export function InternalStorageShape({
 
 export function CollateShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -880,7 +880,7 @@ export function CollateShape({
 
 export function SortShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -926,7 +926,7 @@ export function SortShape({
 
 export function OrShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -985,7 +985,7 @@ export function OrShape({
 
 export function DatabaseShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
@@ -1070,7 +1070,7 @@ export function DatabaseShape({
 
 export function DisplayShape({
   fill = 'transparent',
-  stroke = '#d2d9e6',
+  stroke = '#f4f7fc',
   strokeWidth = 4,
   strokeOpacity = 1,
   strokeStyle = 'solid',
