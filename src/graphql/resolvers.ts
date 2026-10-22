@@ -28,9 +28,11 @@ import {
   deleteDiagram,
   renameDiagramReferences,
   saveDiagram,
+  writeArtifactFile,
 } from '../artifacts/write.js'
 import { createUpload, takeUpload } from '../uploads.js'
 import {
+  API_SAMPLES_DIR,
   COMPONENT_API_CONTRACT_ID,
   COMPONENT_FLOW_DIAGRAM_ID,
   COMPONENT_SUPPORT_KB_ID,
@@ -649,7 +651,39 @@ export function createRootValue(db: Workspace) {
       )
       return true
     },
-    componentLinkUsages: () => [],
+    componentLinkUsages: ({ linkId }: { linkId: string }) =>
+      [...db.maps]
+        .sort((a, b) => a.map.name.localeCompare(b.map.name))
+        .flatMap(({ map, frames }) =>
+          frames.flatMap(({ frame, focalPoints }) =>
+            [...focalPoints]
+              .sort((a, b) => a.point.name.localeCompare(b.point.name))
+              .flatMap(({ point, components }) =>
+                components
+                  .filter(
+                    ({ meta }) =>
+                      meta.componentLinkDiagramId === linkId ||
+                      meta.componentLinkApiEndpointId === linkId ||
+                      meta.componentLinkServiceDocId === linkId
+                  )
+                  .map(({ meta }) => ({
+                    metaId: meta.id,
+                    orgId: ORG_ID,
+                    componentId: meta.componentId,
+                    mapId: map.id,
+                    mapName: map.name,
+                    frameId: frame.id,
+                    frameName: frame.name,
+                    screenshotAssetId: frame.screenshotAssetId,
+                    screenshotImageUrl: frame.screenshotImageUrl,
+                    focalPointId: point.id,
+                    focalPointName: point.name,
+                    locationX: point.locationX,
+                    locationY: point.locationY,
+                  }))
+              )
+          )
+        ),
     maps: (args: {
       folderId?: string | null
       teamId?: string | null
@@ -1410,6 +1444,39 @@ export function createRootValue(db: Workspace) {
     ],
     apiEndpoints: (args: { serviceId: string; apiGroupId: string }) =>
       findApiGroup(db, args.serviceId, args.apiGroupId).endpoints,
+    updateAPIEndpoint: async ({
+      serviceId,
+      apiGroupId,
+      id,
+      input,
+    }: {
+      serviceId: string
+      apiGroupId: string
+      id: string
+      input: {
+        exampleRequests?: string | null
+        exampleResponses?: string | null
+      }
+    }) => {
+      const { group, endpoints } = findApiGroup(db, serviceId, apiGroupId)
+      const endpoint =
+        endpoints.find((e) => e.id === id) ?? notFound('Endpoint', id)
+      const updated = {
+        ...endpoint,
+        exampleRequests: input.exampleRequests ?? endpoint.exampleRequests,
+        exampleResponses: input.exampleResponses ?? endpoint.exampleResponses,
+      }
+      await writeArtifactFile(
+        db.home,
+        `${API_SAMPLES_DIR}/${id}`,
+        JSON.stringify({
+          specHash: group.specHash,
+          exampleRequests: updated.exampleRequests,
+          exampleResponses: updated.exampleResponses,
+        })
+      )
+      return updated
+    },
     apiEndpointById: ({ id }: { id: string }) =>
       db.apiGroups
         .flatMap(({ endpoints }) => endpoints)

@@ -19,6 +19,14 @@ import { glob } from 'tinyglobby'
 import { parse as parseYaml } from 'yaml'
 import { z } from 'zod'
 import { resolveRepositoryFile } from '../analysis/repo-access.js'
+import {
+  graphQLExamples,
+  graphQLTypes,
+  openApiExamples,
+  protoExample,
+  protoTypeIndex,
+  seedExampleSamples,
+} from './api-examples.js'
 
 export const ROOT_CONFIG = '.uigraph.yaml'
 export const ORG_ID = 'local'
@@ -274,6 +282,8 @@ type ParsedEndpoint = {
   summary: string
   description: string
   parameters: string
+  requestBody: string
+  responses: string
 }
 
 const PROTOCOL_LABELS = {
@@ -342,6 +352,7 @@ function parseOpenApi(text: string): ParsedEndpoint[] {
               ? operation.description
               : '',
           parameters: '[]',
+          ...openApiExamples(spec, operation),
         }
       }
     )
@@ -350,6 +361,7 @@ function parseOpenApi(text: string): ParsedEndpoint[] {
 
 function parseGraphQLSchema(text: string): ParsedEndpoint[] {
   const document = parseGraphQL(text)
+  const types = graphQLTypes(document)
   return document.definitions.flatMap((definition) => {
     if (
       (definition.kind !== Kind.OBJECT_TYPE_DEFINITION &&
@@ -370,6 +382,7 @@ function parseGraphQLSchema(text: string): ParsedEndpoint[] {
         summary: '',
         description: field.description?.value ?? '',
         parameters: '[]',
+        ...graphQLExamples(types, definition.name.value, field),
       }
     })
   })
@@ -378,8 +391,9 @@ function parseGraphQLSchema(text: string): ParsedEndpoint[] {
 function parseProto(text: string): ParsedEndpoint[] {
   const packageName = /^\s*package\s+([\w.]+)\s*;/m.exec(text)?.[1] ?? ''
   const services = [...text.matchAll(/\bservice\s+(\w+)\s*\{/g)]
+  const types = protoTypeIndex(text, packageName)
   const rpcs = text.matchAll(
-    /\brpc\s+(\w+)\s*\(\s*(stream\s+)?[\w.]+\s*\)\s*returns\s*\(\s*(stream\s+)?[\w.]+\s*\)/g
+    /\brpc\s+(\w+)\s*\(\s*(stream\s+)?([\w.]+)\s*\)\s*returns\s*\(\s*(stream\s+)?([\w.]+)\s*\)/g
   )
   return [...rpcs].map((rpc) => {
     const service = services.filter((match) => match.index < rpc.index).pop()
@@ -387,7 +401,7 @@ function parseProto(text: string): ParsedEndpoint[] {
       throw new Error(`rpc ${rpc[1]} is outside a service`)
     }
     const clientStream = rpc[2] !== undefined
-    const serverStream = rpc[3] !== undefined
+    const serverStream = rpc[4] !== undefined
     const qualifiedService =
       packageName === '' ? service[1] : `${packageName}.${service[1]}`
     return {
@@ -404,6 +418,8 @@ function parseProto(text: string): ParsedEndpoint[] {
       summary: '',
       description: '',
       parameters: JSON.stringify({ packageName, serviceName: service[1] }),
+      requestBody: protoExample(types, packageName, rpc[3]),
+      responses: protoExample(types, packageName, rpc[5]),
     }
   })
 }
@@ -653,10 +669,10 @@ export async function loadArtifacts(root: string, configFile = ROOT_CONFIG) {
           description: endpoint.description,
           tags: [],
           parameters: endpoint.parameters,
-          requestBody: '{}',
-          responses: '{}',
-          exampleRequests: '[]',
-          exampleResponses: '[]',
+          requestBody: endpoint.requestBody,
+          responses: endpoint.responses,
+          exampleRequests: seedExampleSamples(endpoint.requestBody),
+          exampleResponses: seedExampleSamples(endpoint.responses),
           order: index,
           sla: null,
           createdBy: ACTOR_ID,
