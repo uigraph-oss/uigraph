@@ -26,6 +26,7 @@ import {
   LegacyComponentMeta,
 } from '@/features/services/api/api-adapters'
 import { API_GROUP_SPEC } from '@/features/services/api/api-spec'
+import { BetterTabController, useBetterTabs } from '@/hooks/use-better-tabs'
 import { useScopedStorage } from '@/hooks/use-scoped-storage'
 import { cn } from '@/lib/utils'
 import { useCurrentOrganization } from '@/store/auth-store'
@@ -43,7 +44,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useServiceApiEndpointsContext } from '../../contexts/service-api-endpoints'
 import { ApiBehaviorBar } from './api-behavior-bar'
+import { ConfigureApiEndpointConnections } from './configure-api-endpoint-connections'
+import { ConfigureApiEndpointSamples } from './configure-api-endpoint-samples'
 import { SchemaNode, SchemaTree } from './endpoint-schema-view'
+import { EndpointTryItTab } from './endpoint-try-it-tab'
 import { GraphQLOperationItem } from './rows/graphql-operation-row'
 import { GrpcMethodItem } from './rows/grpc-method-row'
 
@@ -462,6 +466,7 @@ export function ServiceApiEndpoints() {
         baseUrl={baseUrl}
         selectedEnv={selectedEnv}
         fallbackBaseUrl={fallbackBaseUrl}
+        serviceId={serviceId}
         selectedServerIndex={selectedServerIndex}
         onServerIndexChange={setSelectedServerIndex}
       />
@@ -537,6 +542,7 @@ export function ServiceApiEndpoints() {
             {selectedGraphQLOperation ? (
               <GraphQLOperationDetailsPanel
                 operation={selectedGraphQLOperation}
+                readonly={selectedVersionId !== null}
                 onClose={() => void setEndpointId(null)}
               />
             ) : (
@@ -611,6 +617,7 @@ export function ServiceApiEndpoints() {
             {selectedGrpcMethod ? (
               <GrpcMethodDetailsPanel
                 method={selectedGrpcMethod}
+                readonly={selectedVersionId !== null}
                 onClose={() => void setEndpointId(null)}
               />
             ) : (
@@ -706,6 +713,7 @@ export function ServiceApiEndpoints() {
                 <EndpointDetailsPanel
                   endpoint={selectedRestEndpoint}
                   baseUrl={baseUrl}
+                  readonly={selectedVersionId !== null}
                   openApiRuntime={openApiRuntime}
                   onClose={() => void setEndpointId(null)}
                 />
@@ -995,6 +1003,8 @@ function GrpcMethodSidebarRow({
   )
 }
 
+type EndpointTab = 'spec' | 'tryit' | 'samples' | 'connections'
+
 function isJsonSchemaDocument(obj: unknown): boolean {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false
   const o = obj as Record<string, unknown>
@@ -1213,6 +1223,13 @@ function SpecSchemaBlock({ label, raw }: { label: string; raw: string }) {
 type SchemaObj = Record<string, unknown>
 
 type RefResolver = (ref: string) => SchemaObj | null
+
+const endpointTabs: { id: EndpointTab; label: string }[] = [
+  { id: 'spec', label: 'Spec' },
+  { id: 'tryit', label: 'Try it' },
+  { id: 'samples', label: 'Samples' },
+  { id: 'connections', label: 'Connections' },
+]
 
 function resolveSchemaRefs(
   schema: SchemaNode,
@@ -1734,14 +1751,20 @@ function SpecParamList({ params }: { params: SpecParameterData[] }) {
 function EndpointDetailsPanel({
   endpoint,
   baseUrl,
+  readonly,
   openApiRuntime,
   onClose,
 }: {
   endpoint: RestEndpointItem
   baseUrl: string
+  readonly: boolean
   openApiRuntime?: ReturnType<typeof createOpenApiRuntime> | null
   onClose: () => void
 }) {
+  const { updateServiceApiEndpoint, serviceId } =
+    useServiceApiEndpointsContext()
+
+  const [control, activeTab] = useBetterTabs(endpointTabs, 'spec')
   const metaResponses = parseStatusCodesMap(endpoint.statusCodes)
   const specResponsesMap = openApiRuntime
     ? openApiRuntime.operationResponsesByPath(endpoint.method, endpoint.path)
@@ -1757,6 +1780,66 @@ function EndpointDetailsPanel({
       : metaResponses
   const updatedAt =
     endpoint.apiEndpoint.updatedAt || endpoint.apiEndpoint.createdAt
+
+  async function handleSaveRequestSample(body: string) {
+    if (
+      !endpoint.apiEndpoint.apiEndpointId ||
+      !endpoint.apiEndpoint.serviceApiGroupId ||
+      !endpoint.apiEndpoint.componentMetaId
+    ) {
+      toast.error('Missing endpoint data')
+      return
+    }
+
+    const exampleRequests = arrayNonNullable(
+      endpoint.apiEndpoint.exampleRequests
+    )
+    await updateServiceApiEndpoint({
+      variables: {
+        apiEndpointId: endpoint.apiEndpoint.apiEndpointId,
+        input: {
+          serviceApiGroupId: endpoint.apiEndpoint.serviceApiGroupId,
+          componentMetaId: endpoint.apiEndpoint.componentMetaId,
+          order: endpoint.apiEndpoint.order ?? 0,
+          exampleRequests: [...exampleRequests, body],
+          exampleResponses: arrayNonNullable(
+            endpoint.apiEndpoint.exampleResponses
+          ),
+        },
+      },
+    })
+    toast.success('Request sample saved')
+  }
+
+  async function handleSaveResponseSample(body: string) {
+    if (
+      !endpoint.apiEndpoint.apiEndpointId ||
+      !endpoint.apiEndpoint.serviceApiGroupId ||
+      !endpoint.apiEndpoint.componentMetaId
+    ) {
+      toast.error('Missing endpoint data')
+      return
+    }
+
+    const exampleResponses = arrayNonNullable(
+      endpoint.apiEndpoint.exampleResponses
+    )
+    await updateServiceApiEndpoint({
+      variables: {
+        apiEndpointId: endpoint.apiEndpoint.apiEndpointId,
+        input: {
+          serviceApiGroupId: endpoint.apiEndpoint.serviceApiGroupId,
+          componentMetaId: endpoint.apiEndpoint.componentMetaId,
+          order: endpoint.apiEndpoint.order ?? 0,
+          exampleRequests: arrayNonNullable(
+            endpoint.apiEndpoint.exampleRequests
+          ),
+          exampleResponses: [...exampleResponses, body],
+        },
+      },
+    })
+    toast.success('Response sample saved')
+  }
 
   const fullUrl = buildFullUrl(
     baseUrl || getBaseFromUrl(endpoint.fullUrl, endpoint.path),
@@ -1797,12 +1880,61 @@ function EndpointDetailsPanel({
         </div>
       </div>
 
-      <div className="space-y-4 px-4 py-4">
-        <EndpointSpecView
-          endpoint={endpoint}
-          responses={responses}
-          openApiRuntime={openApiRuntime}
+      <div className="border-b px-4 py-2">
+        <BetterTabController
+          control={control}
+          className="m-0 rounded-md"
+          overlayClassName="rounded-md bg-primary shadow-sm"
+          triggerClassName="h-7 rounded-md px-3 text-xs"
+          activeTriggerClassName="text-white"
         />
+      </div>
+
+      <div className="space-y-4 px-4 py-4">
+        {activeTab === 'spec' && (
+          <EndpointSpecView
+            endpoint={endpoint}
+            responses={responses}
+            openApiRuntime={openApiRuntime}
+          />
+        )}
+
+        {activeTab === 'tryit' && (
+          <EndpointTryItTab
+            method={endpoint.method}
+            path={endpoint.path}
+            baseUrl={baseUrl || getBaseFromUrl(endpoint.fullUrl, endpoint.path)}
+            operationId={endpoint.operationId}
+            authKind={
+              openApiRuntime?.hasSecuritySchemes
+                ? endpoint.operationId
+                  ? openApiRuntime.operationAuth(endpoint.operationId)
+                  : openApiRuntime.operationAuthByPath(
+                      endpoint.method,
+                      endpoint.path
+                    )
+                : endpoint.auth
+            }
+            requestSchema={endpoint.requestSchema}
+            parameters={endpoint.parameters}
+            requestExample={endpoint.requestExample}
+            serviceId={serviceId}
+            onSaveRequestSample={handleSaveRequestSample}
+            onSaveResponseSample={handleSaveResponseSample}
+          />
+        )}
+
+        {activeTab === 'samples' && (
+          <ConfigureApiEndpointSamples
+            endpoint={endpoint.apiEndpoint}
+            readonly={readonly}
+            className="px-0"
+          />
+        )}
+
+        {activeTab === 'connections' && (
+          <ConfigureApiEndpointConnections endpoint={endpoint.apiEndpoint} />
+        )}
       </div>
     </div>
   )
@@ -1810,9 +1942,11 @@ function EndpointDetailsPanel({
 
 function GraphQLOperationDetailsPanel({
   operation,
+  readonly,
   onClose,
 }: {
   operation: GraphQLOperationItem
+  readonly: boolean
   onClose: () => void
 }) {
   const fields = useMemo(
@@ -1820,6 +1954,14 @@ function GraphQLOperationDetailsPanel({
     [operation.componentMeta.componentModalFields]
   )
   const flattened = useMemo(() => flattenMetaData(fields, fields), [fields])
+  const [control, activeTab] = useBetterTabs(
+    [
+      { id: 'spec', label: 'Spec' },
+      { id: 'samples', label: 'Samples' },
+      { id: 'connections', label: 'Connections' },
+    ],
+    'spec'
+  )
 
   const nameField = fields.find(
     (field) => field?.label?.toLowerCase() === 'name'
@@ -1904,82 +2046,109 @@ function GraphQLOperationDetailsPanel({
         </p>
       </div>
 
+      <div className="border-b px-4 py-2">
+        <BetterTabController
+          control={control}
+          className="m-0 rounded-md"
+          overlayClassName="rounded-md bg-primary shadow-sm"
+          triggerClassName="h-7 rounded-md px-3 text-xs"
+          activeTriggerClassName="text-white"
+        />
+      </div>
+
       <div className="space-y-4 px-4 py-4">
-        <div className="space-y-5">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className={`${getGraphQLOperationTypeColor(operationKind)} text-white`}
-            >
-              {operationKind}
-            </Badge>
-            <span className="font-mono text-sm font-semibold text-[#F4F7FC]">
-              {operationName}
-            </span>
-          </div>
-
-          {description && (
-            <p className="text-sm text-[#A0ADBE]">{description}</p>
-          )}
-
-          {signature && (
-            <div>
-              <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Signature
-              </p>
-              <pre className="overflow-x-auto rounded-md bg-[#0D1017] px-3 py-2.5 font-mono text-xs text-[#C9D1D9]">
-                {operationKind.toLowerCase()} {signature}
-              </pre>
+        {activeTab === 'spec' && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className={`${getGraphQLOperationTypeColor(operationKind)} text-white`}
+              >
+                {operationKind}
+              </Badge>
+              <span className="font-mono text-sm font-semibold text-[#F4F7FC]">
+                {operationName}
+              </span>
             </div>
-          )}
 
-          {parsedSignature && parsedSignature.args.length > 0 && (
-            <div>
-              <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Arguments
-              </p>
-              <div className="divide-y divide-[#2A3242] rounded-md border border-[#2A3242]">
-                {parsedSignature.args.map((arg, i) => (
-                  <div key={i} className="flex items-baseline gap-2 px-3 py-2">
-                    <span className="font-mono text-xs font-semibold text-[#F4F7FC]">
-                      {arg.name}
-                    </span>
-                    {arg.type && (
-                      <span className="font-mono text-xs text-[#3B82F6]">
-                        {arg.type}
+            {description && (
+              <p className="text-sm text-[#A0ADBE]">{description}</p>
+            )}
+
+            {signature && (
+              <div>
+                <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Signature
+                </p>
+                <pre className="overflow-x-auto rounded-md bg-[#0D1017] px-3 py-2.5 font-mono text-xs text-[#C9D1D9]">
+                  {operationKind.toLowerCase()} {signature}
+                </pre>
+              </div>
+            )}
+
+            {parsedSignature && parsedSignature.args.length > 0 && (
+              <div>
+                <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Arguments
+                </p>
+                <div className="divide-y divide-[#2A3242] rounded-md border border-[#2A3242]">
+                  {parsedSignature.args.map((arg, i) => (
+                    <div
+                      key={i}
+                      className="flex items-baseline gap-2 px-3 py-2"
+                    >
+                      <span className="font-mono text-xs font-semibold text-[#F4F7FC]">
+                        {arg.name}
                       </span>
-                    )}
-                  </div>
-                ))}
+                      {arg.type && (
+                        <span className="font-mono text-xs text-[#3B82F6]">
+                          {arg.type}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {parsedSignature?.returnType && (
-            <div>
-              <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Returns
-              </p>
-              <div className="inline-flex items-center gap-1.5 rounded-md bg-[#0D1017] px-3 py-1.5">
-                <span className="font-mono text-xs text-[#3B82F6]">
-                  {parsedSignature.returnType}
-                </span>
+            {parsedSignature?.returnType && (
+              <div>
+                <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Returns
+                </p>
+                <div className="inline-flex items-center gap-1.5 rounded-md bg-[#0D1017] px-3 py-1.5">
+                  <span className="font-mono text-xs text-[#3B82F6]">
+                    {parsedSignature.returnType}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {variablesRaw && variablesRaw !== '{}' && (
-            <SpecSchemaBlock label="Variables" raw={variablesRaw} />
-          )}
+            {variablesRaw && variablesRaw !== '{}' && (
+              <SpecSchemaBlock label="Variables" raw={variablesRaw} />
+            )}
 
-          {requestSchemaRaw && (
-            <SpecSchemaBlock label="Operation" raw={requestSchemaRaw} />
-          )}
+            {requestSchemaRaw && (
+              <SpecSchemaBlock label="Operation" raw={requestSchemaRaw} />
+            )}
 
-          {responseSchemaRaw && (
-            <SpecSchemaBlock label="Response" raw={responseSchemaRaw} />
-          )}
-        </div>
+            {responseSchemaRaw && (
+              <SpecSchemaBlock label="Response" raw={responseSchemaRaw} />
+            )}
+          </div>
+        )}
+
+        {activeTab === 'samples' && (
+          <ConfigureApiEndpointSamples
+            endpoint={operation.apiEndpoint}
+            readonly={readonly}
+            className="px-0"
+          />
+        )}
+
+        {activeTab === 'connections' && (
+          <ConfigureApiEndpointConnections endpoint={operation.apiEndpoint} />
+        )}
       </div>
     </DynamicScrollArea>
   )
@@ -1987,9 +2156,11 @@ function GraphQLOperationDetailsPanel({
 
 function GrpcMethodDetailsPanel({
   method,
+  readonly,
   onClose,
 }: {
   method: GrpcMethodItem
+  readonly: boolean
   onClose: () => void
 }) {
   const fields = useMemo(
@@ -1997,6 +2168,14 @@ function GrpcMethodDetailsPanel({
     [method.componentMeta.componentModalFields]
   )
   const flattened = useMemo(() => flattenMetaData(fields, fields), [fields])
+  const [control, activeTab] = useBetterTabs(
+    [
+      { id: 'spec', label: 'Spec' },
+      { id: 'samples', label: 'Samples' },
+      { id: 'connections', label: 'Connections' },
+    ],
+    'spec'
+  )
 
   const methodNameField = fields.find(
     (field) =>
@@ -2103,91 +2282,115 @@ function GrpcMethodDetailsPanel({
         </p>
       </div>
 
+      <div className="border-b px-4 py-2">
+        <BetterTabController
+          control={control}
+          className="m-0 rounded-md"
+          overlayClassName="rounded-md bg-primary shadow-sm"
+          triggerClassName="h-7 rounded-md px-3 text-xs"
+          activeTriggerClassName="text-white"
+        />
+      </div>
+
       <div className="space-y-4 px-4 py-4">
-        <div className="space-y-5">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className={`${getGrpcStreamingTypeColor(streamingType)} text-white`}
-            >
-              {streamingLabel[streamingType] ?? streamingType}
-            </Badge>
-            <span className="font-mono text-sm font-semibold text-[#F4F7FC]">
-              {methodName}
-            </span>
-          </div>
+        {activeTab === 'spec' && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className={`${getGrpcStreamingTypeColor(streamingType)} text-white`}
+              >
+                {streamingLabel[streamingType] ?? streamingType}
+              </Badge>
+              <span className="font-mono text-sm font-semibold text-[#F4F7FC]">
+                {methodName}
+              </span>
+            </div>
 
-          <p className="font-mono text-xs text-[#828DA3]">{servicePath}</p>
+            <p className="font-mono text-xs text-[#828DA3]">{servicePath}</p>
 
-          {description && (
-            <p className="text-sm text-[#A0ADBE]">{description}</p>
-          )}
+            {description && (
+              <p className="text-sm text-[#A0ADBE]">{description}</p>
+            )}
 
-          {(requestType || responseType) && (
-            <div className="space-y-3">
-              <p className="text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Message Types
-              </p>
-              <div className="divide-y divide-[#2A3242] rounded-md border border-[#2A3242]">
-                {requestType && (
-                  <div className="flex items-center gap-3 px-3 py-2.5">
-                    <span className="w-16 shrink-0 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                      Request
-                    </span>
-                    <span className="font-mono text-xs text-[#3B82F6]">
-                      {requestType}
-                    </span>
-                  </div>
-                )}
-                {responseType && (
-                  <div className="flex items-center gap-3 px-3 py-2.5">
-                    <span className="w-16 shrink-0 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                      Response
-                    </span>
-                    <span className="font-mono text-xs text-[#3B82F6]">
-                      {responseType}
-                    </span>
-                  </div>
-                )}
+            {(requestType || responseType) && (
+              <div className="space-y-3">
+                <p className="text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Message Types
+                </p>
+                <div className="divide-y divide-[#2A3242] rounded-md border border-[#2A3242]">
+                  {requestType && (
+                    <div className="flex items-center gap-3 px-3 py-2.5">
+                      <span className="w-16 shrink-0 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                        Request
+                      </span>
+                      <span className="font-mono text-xs text-[#3B82F6]">
+                        {requestType}
+                      </span>
+                    </div>
+                  )}
+                  {responseType && (
+                    <div className="flex items-center gap-3 px-3 py-2.5">
+                      <span className="w-16 shrink-0 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                        Response
+                      </span>
+                      <span className="font-mono text-xs text-[#3B82F6]">
+                        {responseType}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {streamingType !== 'UNARY' && (
-            <div className="rounded-md border border-[#2A3242] bg-[#0D1017] px-3 py-2.5">
-              <p className="text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Streaming Mode
-              </p>
-              <p className="mt-1 text-xs text-[#A0ADBE]">
-                {streamingType === 'SERVER_STREAMING' &&
-                  'The server sends a stream of messages in response to a single client request.'}
-                {streamingType === 'CLIENT_STREAMING' &&
-                  'The client sends a stream of messages and the server replies with a single response.'}
-                {streamingType === 'BIDIRECTIONAL_STREAMING' &&
-                  'Both client and server send streams of messages independently.'}
-              </p>
-            </div>
-          )}
+            {streamingType !== 'UNARY' && (
+              <div className="rounded-md border border-[#2A3242] bg-[#0D1017] px-3 py-2.5">
+                <p className="text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Streaming Mode
+                </p>
+                <p className="mt-1 text-xs text-[#A0ADBE]">
+                  {streamingType === 'SERVER_STREAMING' &&
+                    'The server sends a stream of messages in response to a single client request.'}
+                  {streamingType === 'CLIENT_STREAMING' &&
+                    'The client sends a stream of messages and the server replies with a single response.'}
+                  {streamingType === 'BIDIRECTIONAL_STREAMING' &&
+                    'Both client and server send streams of messages independently.'}
+                </p>
+              </div>
+            )}
 
-          {protoSnippet && (
-            <div>
-              <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
-                Proto Definition
-              </p>
-              <pre className="overflow-x-auto rounded-md bg-[#0D1017] px-3 py-2.5 font-mono text-xs text-[#C9D1D9]">
-                {protoSnippet.replace(/\\n/g, '\n')}
-              </pre>
-            </div>
-          )}
+            {protoSnippet && (
+              <div>
+                <p className="mb-2 text-[10px] font-semibold tracking-wider text-[#828DA3] uppercase">
+                  Proto Definition
+                </p>
+                <pre className="overflow-x-auto rounded-md bg-[#0D1017] px-3 py-2.5 font-mono text-xs text-[#C9D1D9]">
+                  {protoSnippet.replace(/\\n/g, '\n')}
+                </pre>
+              </div>
+            )}
 
-          {requestSchemaRaw && (
-            <SpecSchemaBlock label="Request" raw={requestSchemaRaw} />
-          )}
+            {requestSchemaRaw && (
+              <SpecSchemaBlock label="Request" raw={requestSchemaRaw} />
+            )}
 
-          {responseSchemaRaw && (
-            <SpecSchemaBlock label="Response" raw={responseSchemaRaw} />
-          )}
-        </div>
+            {responseSchemaRaw && (
+              <SpecSchemaBlock label="Response" raw={responseSchemaRaw} />
+            )}
+          </div>
+        )}
+
+        {activeTab === 'samples' && (
+          <ConfigureApiEndpointSamples
+            endpoint={method.apiEndpoint}
+            readonly={readonly}
+            className="px-0"
+          />
+        )}
+
+        {activeTab === 'connections' && (
+          <ConfigureApiEndpointConnections endpoint={method.apiEndpoint} />
+        )}
       </div>
     </DynamicScrollArea>
   )

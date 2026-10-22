@@ -14,6 +14,7 @@ import {
 import { writeArtifactFile } from './artifacts/write.js'
 
 export const WORKSPACE_CONFIG = '.uigraph/workspace.yaml'
+export const API_SAMPLES_DIR = '.uigraph/api-samples'
 export const COMPONENT_API_CONTRACT_ID = 'component_api-contract'
 export const COMPONENT_FLOW_DIAGRAM_ID = 'component_backend-flow-diagram'
 export const COMPONENT_SUPPORT_KB_ID = 'component_support-kb-troubleshooting'
@@ -21,6 +22,11 @@ const REGISTRY = '.uigraph/registry.yaml'
 const WORKSPACE_ID = 'workspace'
 
 const registrySchema = z.object({ projects: z.array(z.string().min(1)) })
+const apiSamplesSchema = z.object({
+  specHash: z.string(),
+  exampleRequests: z.string(),
+  exampleResponses: z.string(),
+})
 
 type Project = { id: string; root: string; configFile: string }
 
@@ -318,6 +324,33 @@ export async function loadWorkspace() {
       maps.push({ ...map, project })
     }
     dependencies.push(...db.dependencies)
+  }
+
+  const samplesDir = path.join(home, API_SAMPLES_DIR)
+  const sampleFiles = new Set(
+    await fs.readdir(samplesDir).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === 'ENOENT') {
+        return []
+      }
+      throw error
+    })
+  )
+  for (const { group, endpoints } of apiGroups) {
+    for (const endpoint of endpoints) {
+      if (!sampleFiles.has(endpoint.id)) {
+        continue
+      }
+      const saved = apiSamplesSchema.parse(
+        JSON.parse(
+          await fs.readFile(path.join(samplesDir, endpoint.id), 'utf8')
+        )
+      )
+      if (saved.specHash !== group.specHash) {
+        continue
+      }
+      endpoint.exampleRequests = saved.exampleRequests
+      endpoint.exampleResponses = saved.exampleResponses
+    }
   }
 
   for (const dependency of dependencies) {
