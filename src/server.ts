@@ -68,6 +68,7 @@ const SUPPORTED_MUTATIONS = [
   'createSavedQuery',
   'updateSavedQuery',
   'deleteSavedQuery',
+  'updateAPIEndpoint',
   'createMap',
   'updateMap',
   'deleteMap',

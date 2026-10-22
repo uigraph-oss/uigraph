@@ -9,10 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 import type { OpenApiRuntime } from '@/utils/api/openapi-runtime'
 import { Copy, Lock, LockOpen } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
+import {
+  ApiAuthorizeDialog,
+  useApiAuthorizeDialog,
+} from './api-authorize-dialog'
 
 type ApiGroupVersionOption = {
   versionId?: string | null
@@ -29,6 +34,7 @@ type ApiBehaviorBarProps = {
   baseUrl?: string
   selectedEnv?: string
   fallbackBaseUrl?: string
+  serviceId?: string
   selectedServerIndex?: string
   onServerIndexChange?: (index: string) => void
 }
@@ -42,6 +48,7 @@ export function ApiBehaviorBar({
   baseUrl = '',
   selectedEnv = 'production',
   fallbackBaseUrl = '',
+  serviceId = '',
   selectedServerIndex = '0',
   onServerIndexChange,
 }: ApiBehaviorBarProps) {
@@ -68,6 +75,7 @@ export function ApiBehaviorBar({
           baseUrl={baseUrl}
           selectedEnv={selectedEnv}
           fallbackBaseUrl={fallbackBaseUrl}
+          serviceId={serviceId}
           selectedServerIndex={selectedServerIndex}
           onServerIndexChange={onServerIndexChange}
         />
@@ -93,6 +101,7 @@ export function ApiBehaviorBar({
               baseUrl={baseUrl}
               selectedEnv={selectedEnv}
               fallbackBaseUrl={fallbackBaseUrl}
+              serviceId={serviceId}
               selectedServerIndex={selectedServerIndex}
               onServerIndexChange={onServerIndexChange}
             />
@@ -149,6 +158,7 @@ function ServerControls({
   baseUrl,
   selectedEnv,
   fallbackBaseUrl,
+  serviceId,
   selectedServerIndex,
   onServerIndexChange,
 }: {
@@ -156,9 +166,15 @@ function ServerControls({
   baseUrl: string
   selectedEnv: string
   fallbackBaseUrl: string
+  serviceId: string
   selectedServerIndex: string
   onServerIndexChange?: (index: string) => void
 }) {
+  const authorize = useApiAuthorizeDialog(
+    serviceId,
+    openApiRuntime.securitySchemes
+  )
+
   const serverOptions = useMemo(() => {
     const servers = openApiRuntime.servers
     if (!servers.length) {
@@ -180,6 +196,8 @@ function ServerControls({
   const selectedServer =
     serverOptions.find((option) => option.value === selectedServerIndex) ??
     serverOptions[0]
+
+  const { hasSecuritySchemes, isAuthorized, openDialog } = authorize
 
   return (
     <>
@@ -228,15 +246,34 @@ function ServerControls({
           Copy
         </Button>
 
-        <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-[#2A3242] px-3 text-xs text-[#828DA3]">
-          {openApiRuntime.hasSecuritySchemes ? (
-            <Lock className="h-3.5 w-3.5" />
-          ) : (
+        {hasSecuritySchemes ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              'h-8 shrink-0 gap-1.5 rounded-full px-3 text-xs',
+              isAuthorized
+                ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10'
+                : 'border-[#2A3242] text-[#D2D9E6] hover:bg-[#1E2533]'
+            )}
+            onClick={openDialog}
+          >
+            {isAuthorized ? (
+              <Lock className="h-3.5 w-3.5" />
+            ) : (
+              <LockOpen className="h-3.5 w-3.5" />
+            )}
+            Authorize
+          </Button>
+        ) : (
+          <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-[#2A3242] px-3 text-xs text-[#828DA3]">
             <LockOpen className="h-3.5 w-3.5" />
-          )}
-          {openApiRuntime.hasSecuritySchemes ? 'Auth required' : 'No auth'}
-        </span>
+            No auth
+          </span>
+        )}
       </div>
+
+      <ApiAuthorizeDialog {...authorize} serviceId={serviceId} />
     </>
   )
 }
