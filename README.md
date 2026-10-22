@@ -29,9 +29,8 @@
 </p>
 
 <p align="center">
-  <img src="docs/media/uigraph-demo.gif" alt="Running uigraph shows the UIGraph banner and starts the local viewer" width="800" />
+  <img src="docs/media/uigraph-story.gif" alt="UIGraph story" width="800" />
 </p>
-<p align="center"><a href="docs/media/uigraph-demo.mp4">Watch the demo video</a></p>
 
 Every service in your codebase, with its APIs, dependencies, databases and diagrams. Your coding agent writes them as plain files in your repo, and UIGraph shows them in a local viewer.
 
@@ -112,10 +111,6 @@ Running the skill, or `uigraph` in the project, adds the project to the viewer. 
 Diagram edits you make in the viewer are saved back to the same files, so the agent sees them the next time it runs.
 
 ## Architecture diagrams
-
-<p align="center">
-  <img src="docs/media/architecture-diagram-placeholder.svg" alt="An architecture diagram in the UIGraph viewer" width="800" />
-</p>
 
 Ask your agent to draw how your system works, straight from the code:
 
