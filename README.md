@@ -47,13 +47,13 @@ Works with Claude Code, Codex, OpenCode, Pi and Cursor. Free and open source.
 ## Install
 
 ```sh
-npm install -g uigraph
+npm install -g uigraph@latest
 ```
 
 Or run it without installing:
 
 ```sh
-npx uigraph
+npx uigraph@latest
 ```
 
 Requires Node.js 20 or later.
