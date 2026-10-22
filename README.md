@@ -2,12 +2,13 @@
   <img src="docs/media/uigraph-mark.svg" alt="UIGraph" width="96" height="96" />
 </p>
 <h1 align="center">UIGraph</h1>
-<h3 align="center">Explore your software system’s engineering context.</h3>
+<h3 align="center">The engineering map of your codebase.</h3>
 
 <p align="center">
   <a href="#install"><strong>Install</strong></a> &nbsp;·&nbsp;
   <a href="#quick-start"><strong>Quick start</strong></a> &nbsp;·&nbsp;
   <a href="#use-the-uigraph-skill"><strong>Skill</strong></a> &nbsp;·&nbsp;
+  <a href="#architecture-diagrams"><strong>Diagrams</strong></a> &nbsp;·&nbsp;
   <a href="#commands"><strong>Commands</strong></a> &nbsp;·&nbsp;
   <a href="#lens"><strong>Lens</strong></a>
 </p>
@@ -28,12 +29,20 @@
 </p>
 
 <p align="center">
-  <img src="docs/media/uigraph-demo.gif" alt="Running uigraph shows the UIGraph banner and starts the local viewer" width="800" />
+  <img src="docs/media/uigraph-story.gif" alt="UIGraph story" width="800" />
 </p>
 
-UIGraph is an open-source local viewer for your project's engineering context. The UIGraph skill guides your coding agent through reading your project and creating artifacts that describe your system, including service maps, API specs, dependency graphs, and architecture diagrams. Together, these artifacts give you a clearer picture of how your system is structured and how its components relate to one another.
+Every service in your codebase, with its APIs, dependencies, databases and diagrams. Your coding agent writes them as plain files in your repo, and UIGraph shows them in a local viewer.
 
-Works with Claude Code, Codex, OpenCode, Pi, and Cursor.
+Works with Claude Code, Codex, OpenCode, Pi and Cursor. Free and open source.
+
+## Why UIGraph
+
+- **Lives in your repo.** Artifacts are plain files: `.uigraph.yaml`, Mermaid, OpenAPI and SQL. You version them, diff them and review them in pull requests.
+- **Built from your code.** The agent writes only what it finds in your files, and you choose which diagrams and documents it creates.
+- **Two-way.** Edit a diagram in the viewer and it is saved back to the file.
+- **Reviews pull requests.** `uigraph lens` shows the flows a change touches, its impact, test coverage and rollout.
+- **Your agent, your logins.** UIGraph uses the coding agent you already have.
 
 ## Install
 
@@ -57,7 +66,7 @@ Install the UIGraph skill in your coding agent once:
 npx skills add uigraph-oss/skills
 ```
 
-Then, in your project, start the agent and ask it to generate the artifacts:
+In your project, start the agent and ask it to generate the artifacts:
 
 ```
 /uigraph Generate the UIGraph artifacts for this project
@@ -65,11 +74,11 @@ Then, in your project, start the agent and ask it to generate the artifacts:
 
 1. The agent explores the project.
 2. It proposes diagrams and existing documents, and you pick the ones you want.
-3. It writes the artifacts and adds them to the viewer.
+3. It writes the artifacts, adds them to the viewer and opens it.
 
-The first time, it also adds instructions for coding agents. See [What UIGraph changes in your project](#what-uigraph-changes-in-your-project).
+The first time, it also adds a short `.uigraph/AGENTS.md`, so your agent keeps the artifacts up to date as the code changes. See [What UIGraph changes](#what-uigraph-changes).
 
-Then run UIGraph in the project:
+To open the viewer again later, run UIGraph in the project:
 
 ```sh
 cd your-project
@@ -82,28 +91,49 @@ Moving to another project? Run `uigraph` there too. If the viewer is already run
 
 ## Use the UIGraph skill
 
-You can also ask the skill for one artifact at a time:
+Ask for everything at once, as in [Quick start](#quick-start), or for one artifact at a time. The agent reads your code and writes `.uigraph.yaml` and files under `.uigraph/`.
 
-```
-/uigraph Create a sequence diagram of the checkout flow
-/uigraph Create a system context diagram for this service
-/uigraph Create a state diagram for the order status
-/uigraph Create the database schema from the migrations
-```
+| Artifact              | Example prompt                                                      | Written to                                                                |
+| --------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Architecture diagrams | `/uigraph Create a sequence diagram of the checkout flow`           | `.uigraph/diagrams/`. See [Architecture diagrams](#architecture-diagrams) |
+| API specs             | `/uigraph Create the API spec for this service`                     | `.uigraph/openapi/`. Existing specs are used where they are               |
+| Database schemas      | `/uigraph Create the database schema from the migrations`           | `.uigraph/db/`                                                            |
+| Saved queries         | `/uigraph Add the important queries against the orders database`    | `.uigraph/queries/`                                                       |
+| Dependencies          | `/uigraph List the services and datastores this service depends on` | `.uigraph.yaml`                                                           |
+| Docs                  | `/uigraph Document how to run and operate this service`             | `.uigraph/docs/`. Existing docs are used where they are                   |
 
-The agent reads the code and writes `.uigraph.yaml` and files under `.uigraph/`, for example:
-
-```
-.uigraph.yaml
-.uigraph/diagrams/checkout-flow/checkout-flow.mmd
-.uigraph/diagrams/checkout-flow/context.json
-```
+The skill writes only what it finds in your files. It also creates maps when you ask for them, and cost tags and a timeline when your repo has the evidence for them.
 
 ### See them in the viewer
 
-Run `uigraph` in the project once. It adds the project to the viewer and opens it. After that, the viewer reads the files on every page load, so refresh the browser to see anything the agent writes later. You don't need to run `uigraph` again.
+Running the skill, or `uigraph` in the project, adds the project to the viewer. After that, the viewer reads the files on every page load, so refresh the browser to see anything the agent writes later.
 
-Edits you make in the viewer are saved back to the same files, so the agent sees them the next time it runs.
+Diagram edits you make in the viewer are saved back to the same files, so the agent sees them the next time it runs.
+
+## Architecture diagrams
+
+Ask your agent to draw how your system works, straight from the code:
+
+```
+/uigraph Create a system context diagram for this service
+/uigraph Create a sequence diagram of the login flow
+/uigraph Create a state diagram for the order status
+/uigraph Create a diagram of the background jobs
+/uigraph Create C4 container and component diagrams for this service
+```
+
+The agent reads your code, proposes diagrams, and you pick the ones you want. It draws only what it finds in your files.
+
+| Diagram             | Shows                                                     | Type                          |
+| ------------------- | --------------------------------------------------------- | ----------------------------- |
+| System context      | The service, its datastores and every outbound dependency | Flowchart                     |
+| Request or flow     | One important flow, such as login, checkout or ingestion  | Sequence diagram              |
+| Background flow     | Workers, queues, scheduled jobs and webhook handlers      | Flowchart or sequence diagram |
+| State machine       | An entity with a status and its transitions               | State diagram                 |
+| Internal components | How the main modules call each other                      | Flowchart                     |
+| Deployment          | Kubernetes or Terraform with several units                | Flowchart                     |
+
+To keep diagrams current, ask your agent to update them after a change. The `.uigraph/AGENTS.md` that the skill adds on the first run tells agents to do this as they work.
 
 ## Commands
 
@@ -118,16 +148,16 @@ Starts the viewer, adds the project's artifacts to it, and opens the browser. If
 
 ### `uigraph sync`
 
-Adds the project's existing artifacts to the viewer and exits. It does not start the viewer or generate anything. Use it to show a project again after you delete its service in the viewer, or to show a repository that already has artifacts.
+Adds the project's existing artifacts to the viewer and exits. It does not start the viewer or generate anything. Use it to add a project that already has artifacts, for example from a script.
 
 ### Viewer: `start`, `status`, `stop`, `restart`
 
-| Command           | Does                                                                   |
-| ----------------- | ---------------------------------------------------------------------- |
-| `uigraph start`   | Start the viewer in this terminal                                      |
-| `uigraph status`  | Show whether the viewer is running and which projects it shows         |
-| `uigraph stop`    | Stop the viewer                                                        |
-| `uigraph restart` | Stop the viewer, wherever it runs, and start it again in this terminal |
+| Command           | Does                                                           |
+| ----------------- | -------------------------------------------------------------- |
+| `uigraph start`   | Start the viewer in this terminal                              |
+| `uigraph status`  | Show whether the viewer is running and which projects it shows |
+| `uigraph stop`    | Stop the viewer                                                |
+| `uigraph restart` | Stop the running viewer and start a new one in this terminal   |
 
 Each accepts `--port <number>`.
 
@@ -147,32 +177,39 @@ Reviews a GitHub pull request, or the difference between two branches, to help y
 | `--port <number>`   | Viewer port                                         |
 | `--no-open`         | Do not open a browser                               |
 
-### Other options
+### Global options
 
 - `--debug`: print stack traces for unexpected errors (or set `UIGRAPH_DEBUG=1`).
 - `-v`, `--version`: print the version.
 
 Run `uigraph <command> --help` for details.
 
-## Agents and sign-in
+## What UIGraph changes
 
-Lens uses your own login for the agent you pick:
+**In your project**
 
-- **Claude Code:** your Claude login or `ANTHROPIC_API_KEY`. Set `CLAUDE_CONFIG_DIR` if your Claude settings live outside `~/.claude`.
-- **Codex:** `codex login` or `CODEX_API_KEY`.
-- **OpenCode:** provider keys such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`. UIGraph runs its own OpenCode build with separate settings in `~/.uigraph/opencode`, so it does not reuse the logins of an installed OpenCode.
-- **Pi:** `~/.pi/agent/auth.json` or provider keys such as `ANTHROPIC_API_KEY`.
-- **Cursor:** `CURSOR_API_KEY`. Without `--model`, Cursor picks the model.
-
-## What UIGraph changes in your project
-
-- The UIGraph skill writes `.uigraph.yaml` and `.uigraph/`.
-- When the project has no artifacts yet, the skill also writes instructions for coding agents to `.uigraph/AGENTS.md`. They tell agents such as Claude Code and Codex when and how to update the artifacts as they change the code. It adds a short UIGraph section that points to that file to `CLAUDE.md` and `AGENTS.md`, whichever exist, or creates `AGENTS.md`.
+- The UIGraph skill writes `.uigraph.yaml` and the files under `.uigraph/`.
+- When the project has no artifacts yet, the skill also adds `.uigraph/AGENTS.md`. It tells agents such as Claude Code and Codex when and how to update the artifacts as they change the code. A short UIGraph section in `CLAUDE.md` and `AGENTS.md` points to it. If neither file exists, the skill creates `AGENTS.md`.
 - Diagram edits in the viewer are saved back to the project's files. Services, APIs and dependencies are read-only in the viewer.
-- Diagrams created on the Diagrams page are saved in `~/.uigraph/`. Diagrams created on a service's Architecture tab are saved in that service's project.
+- Diagrams created on a service's Architecture tab are saved in that service's project.
+
+**On your machine**
+
+- `~/.uigraph/` holds your registered projects, the viewer log, Lens runs and settings, and diagrams created on the Diagrams page.
 - The viewer listens on `127.0.0.1` only.
 
 ## Lens
+
+Lens helps you understand a change before you approve it. For each review it shows:
+
+- Before and after diagrams of the flows the change touches
+- How the change compares with its issue, description and commits
+- Values the code picked, such as limits and timeouts
+- Other services the change affects
+- Which new behavior has a test
+- A safe order to ship, with checks before you deploy
+
+Each step can be turned off. See [Customize](#customize).
 
 ### What to review
 
@@ -208,7 +245,14 @@ The viewer process reads the token. It is not sent to the browser.
 
 ### Customize
 
-Select **Customize** in a review to set a focus, for example "look for double charges", to turn review steps on or off, to pick how many flow diagrams Lens draws (1 to 4), and to choose the agent and model for reviews started from the viewer. Lens saves these settings in `~/.uigraph/lens/settings.json`.
+Select **Customize** in a review to choose:
+
+- a focus, for example "look for double charges"
+- which review steps to run
+- how many flow diagrams Lens draws (1 to 4)
+- the agent and model for reviews started from the viewer
+
+Lens saves these settings in `~/.uigraph/lens/settings.json`.
 
 A repository can set the same options for everyone who reviews it, in a `.uigraph.lens.yml` file at its root:
 
@@ -222,9 +266,26 @@ diagrams: 2
 
 Lens reads this file from the base branch, so a pull request cannot change how it is reviewed. The repository focus is used together with your own focus. Steps and diagrams in the file replace your settings.
 
-## Demo
+### Agents and sign-in
 
-<a href="docs/media/uigraph-demo.mp4"><img src="docs/media/uigraph-demo-poster.png" alt="UIGraph demo video: start-up, status and stop" width="800" /></a>
+The skill runs inside your agent. Lens starts an agent itself, using your own login for the one you pick:
+
+- **Claude Code:** your Claude login or `ANTHROPIC_API_KEY`. Set `CLAUDE_CONFIG_DIR` if your Claude settings live outside `~/.claude`.
+- **Codex:** `codex login` or `CODEX_API_KEY`.
+- **OpenCode:** provider keys such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`. UIGraph bundles its own OpenCode with its own settings in `~/.uigraph/opencode`, so it ignores any OpenCode you have installed.
+- **Pi:** `~/.pi/agent/auth.json` or provider keys such as `ANTHROPIC_API_KEY`.
+- **Cursor:** `CURSOR_API_KEY`. Without `--model`, Cursor picks the model.
+
+Lens sends the code it reviews to the agent's model provider.
+
+## UIGraph Cloud and self-hosted
+
+The local viewer is free. For shared catalogs, teams and roles, integrations, AI features and SSO, see [UIGraph Cloud](https://console.uigraph.app) or [self-host UIGraph](https://docs.uigraph.app/self-hosting). The Plans page in the viewer compares them.
+
+## Learn more
+
+- [Documentation](https://docs.uigraph.app)
+- [Contributing](CONTRIBUTING.md)
 
 ## License
 
